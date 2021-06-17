@@ -42,6 +42,7 @@ TYPED_FLAGS_ARGS = {
     v.enable_string: v.param_type for k, v in CHECKS.items() if v.param_type
 }
 
+PLAIN_FLAGS["icu-message-format"] = gettext_lazy("ICU Message Format")
 PLAIN_FLAGS["rst-text"] = gettext_lazy("RST text")
 PLAIN_FLAGS["md-text"] = gettext_lazy("Markdown text")
 PLAIN_FLAGS["xml-text"] = gettext_lazy("XML text")
