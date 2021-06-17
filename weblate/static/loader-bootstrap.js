@@ -1,4 +1,5 @@
 var loading = 0;
+var icu_id = 0;
 
 // Remove some weird things from location hash
 if (
@@ -334,6 +335,207 @@ function quoteSearch(value) {
   return value;
 }
 
+function initFormatMessage(root) {
+  root.querySelectorAll(".highlight-editor").forEach(function (editor) {
+    var lang = editor.getAttribute("lang");
+    var mode = editor.getAttribute("data-mode");
+    if (mode !== 'icu-message-format' || !lang) {
+      return;
+    }
+
+    // Underscores aren't valid in locales as far as JS is concerned.
+    lang = lang.replace(/_/g, '-');
+
+    var parent = editor.closest('form');
+    parent = parent && parent.parentElement;
+
+    var preview = parent && parent.querySelector('.icu-livepreview.hidden');
+    if (!preview) {
+      return;
+    }
+
+    var source_comment = root.querySelector('#icu-source-comment');
+    var source_vars;
+    if ( source_comment ) {
+      try {
+        source_vars = JSON.parse(source_comment.textContent);
+      } catch(err) {
+        source_vars = null;
+      }
+    }
+
+    preview.classList.toggle('hidden', false);
+    var body = preview.querySelector('div.panel-body div');
+    var footer = preview.querySelector('form.panel-body');
+    var variables = {}, old_types = {}, editors = {};
+    var parsed, types, error;
+
+    var updateTranslation = function() {
+      body.innerHTML = '';
+
+      if(error) {
+        body.textContent = error;
+        return;
+      }
+
+      if(!parsed) {
+        return;
+      }
+
+      try {
+        body.textContent = FormatMessageParser.interpret(parsed, lang)(variables);
+      } catch(err) {
+        body.textContent = `Error Interpretting: ${err}`;
+      }
+    }
+
+    var syncContent = function() {
+      parsed = types = error = null;
+      try {
+        parsed = FormatMessageParser.parse(editor.value);
+        types = FormatMessageParser.extract(parsed);
+      } catch(err) {
+        error = err.message;
+      }
+
+      var has_error = error != null;
+      preview.classList.toggle('panel-default', !has_error);
+      preview.classList.toggle('panel-danger', has_error);
+
+      var new_editors = {};
+
+      if(types) {
+        Object.values(types).forEach(function(type) {
+          var key = type.name;
+          var old_type = old_types && old_types[key];
+          if(old_type && JSON.stringify(old_type) === JSON.stringify(type)) {
+            new_editors[key] = editors[key];
+            return;
+          }
+
+          var ttype = type.type;
+          var is_time = ['date','time','datetime'].includes(ttype);
+          var is_number = ['number','plural','selectordinal','duration'].includes(ttype);
+
+          var editor;
+
+          if (variables[key] == null && source_vars && source_vars.hasOwnProperty(key)) {
+            var value = source_vars[key];
+            if ( is_time ) {
+              try {
+                value = new Date(value);
+              } catch(err) {
+                value = undefined;
+              }
+            }
+
+            if ( value != null ) {
+              variables[key] = value;
+            }
+          }
+
+          if (variables[key] == null) {
+            if (is_time) {
+              variables[key] = new Date;
+            } else if ( is_number ) {
+              variables[key] = 0;
+            } else if ( ttype === 'select' && type.choices ) {
+              variables[key] = type.choices[0];
+            } else {
+              variables[key] = key;
+            }
+          }
+
+          if(ttype === 'select') {
+            editor = document.createElement('select');
+            for(var choice of type.choices) {
+              var el = document.createElement('option');
+              el.textContent = el.value = choice;
+              editor.appendChild(el);
+            }
+
+          } else {
+            editor = document.createElement('input');
+
+            var edit_type;
+            if ( ttype === 'datetime' ) {
+              edit_type = 'datetime-local';
+            } else if ( is_number ) {
+              edit_type = 'number';
+            } else if ( is_time ) {
+              edit_type = ttype;
+            } else {
+              edit_type = 'string';
+            }
+
+            editor.setAttribute('type', edit_type);
+          }
+
+          var is_date = variables[key] instanceof Date;
+          if (is_date && is_time) {
+            editor.valueAsNumber = variables[key].getTime();
+          } else
+            editor.value = variables[key];
+
+          function updateValue() {
+            var value;
+            if (is_time) {
+              value = new Date(editor.valueAsNumber);
+            } else {
+              value = editor.value;
+            }
+
+            variables[key] = value;
+            updateTranslation();
+          }
+
+          var id = 'icu-' + (icu_id++);
+          editor.setAttribute('id', id);
+          editor.setAttribute('class', 'form-control');
+
+          editor.addEventListener('input', updateValue);
+
+          var group = document.createElement('div');
+          group.setAttribute('class', 'form-group');
+
+          var label = document.createElement('label');
+          label.setAttribute('for', id);
+          label.setAttribute('class', 'col-sm-2 control-label');
+          label.textContent = key;
+
+          group.appendChild(label);
+          group.appendChild(document.createTextNode(' '));
+
+          var wrap = document.createElement('div');
+          wrap.setAttribute('class', 'col-sm-10');
+          wrap.appendChild(editor);
+
+          group.appendChild(wrap);
+
+          new_editors[key] = group;
+          footer.appendChild(group);
+        });
+      }
+
+      // Remove the old editors.
+      for(var key in editors)
+        if( editors.hasOwnProperty(key) && new_editors[key] != editors[key] ) {
+          editors[key].remove();
+        }
+
+      footer.classList.toggle('hidden', ! Object.keys(new_editors).length);
+
+      old_types = types;
+      editors = new_editors;
+
+      updateTranslation();
+    };
+
+    syncContent();
+    editor.addEventListener("input", syncContent);
+  });
+}
+
 function initHighlight(root) {
   if (typeof ResizeObserver === "undefined") {
     return;
@@ -379,6 +581,7 @@ function initHighlight(root) {
     /* Content synchronisation and highlighting */
     var languageMode = Prism.languages[mode];
     if (editor.classList.contains("translation-editor")) {
+      const is_icu = mode === 'icu-message-format';
       let placeables = editor.getAttribute("data-placeables");
       let extension = {
         hlspace: {
@@ -386,7 +589,7 @@ function initHighlight(root) {
           lookbehind: true,
         },
       };
-      if (placeables) {
+      if (placeables && ! is_icu) {
         extension.placeable = RegExp(placeables);
       }
       /*
@@ -396,6 +599,25 @@ function initHighlight(root) {
       for (var key in languageMode) {
         if (languageMode.hasOwnProperty(key)) {
           extension[key] = Prism.util.clone(languageMode[key]);
+        }
+      }
+      if (placeables && is_icu) {
+        const content = extension.argument && extension.argument.inside && extension.argument.inside.content;
+        if (content && content.inside && content.inside['argument-name']) {
+          const rep = {
+            placeable: {
+              pattern: RegExp(`\\b(?:${placeables})\\b`),
+              lookbehind: true
+            }
+          };
+
+          for(var key in content.inside) {
+            if (content.inside.hasOwnProperty(key)) {
+              rep[key] = content.inside[key];
+            }
+          }
+
+          content.inside = rep;
         }
       }
       languageMode = extension;
@@ -1167,6 +1389,7 @@ $(function () {
   /* Textarea higlighting */
   Prism.languages.none = {};
   initHighlight(document);
+  initFormatMessage(document);
 
   /* Warn users that they do not want to use developer console in most cases */
   console.log("%cStop!", "color: red; font-weight: bold; font-size: 50px;");

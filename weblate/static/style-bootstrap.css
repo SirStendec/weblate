@@ -1781,3 +1781,6 @@ a.language:hover {
   vertical-align: middle;
   margin: 3px;
 }
+.icu-livepreview div.panel-body div {
+  white-space: pre-wrap;
+}
