@@ -214,6 +214,50 @@ ECMAScript template literals
    :ref:`check-formats`,
    `Template literals <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals>`_
 
+.. _check-icu-message-format:
+
+ICU MessageFormat
+*****************
+
+*Syntax errors and/or placeholders that do not match source*
+
+.. hint::
+
+    This check is for use with software that does not have special handling
+    for XML tags in ICU MessageFormat strings. If your software *does* have
+    support, you should use :ref:`check-icu-xml-format` instead.
+
++------------------------+------------------------------------------------------------+
+| Interpolation          | ``You have {count, plural, one {# pie} other {# pies}}.``  |
++------------------------+------------------------------------------------------------+
+| Flag to enable         | `icu-message-format`                                       |
++------------------------+------------------------------------------------------------+
+
+.. seealso::
+
+    :ref:`check-formats`,
+    `ICU: Formatting Messages <https://unicode-org.github.io/icu/userguide/format_parse/messages/>`_
+    `Format.JS: Message Syntax <https://formatjs.io/docs/core-concepts/icu-syntax/>`_
+
+.. _check-icu-xml-format:
+
+ICU MessageFormat with Simple XML
+*********************************
+
+*Syntax errors and/or placeholders that do not match source*
+
++------------------------+------------------------------------------------------------+
+| Interpolation          | ``Price: <bold>{price, number, ::currency/USD}</bold>``    |
++------------------------+------------------------------------------------------------+
+| Flag to enable         | `icu-xml-format`                                           |
++------------------------+------------------------------------------------------------+
+
+.. seealso::
+
+    :ref:`check-formats`,
+    `ICU: Formatting Messages <https://unicode-org.github.io/icu/userguide/format_parse/messages/>`_
+    `Format.JS: Message Syntax <https://formatjs.io/docs/core-concepts/icu-syntax/>`_
+
 .. _check-i18next-interpolation:
 
 i18next interpolation
