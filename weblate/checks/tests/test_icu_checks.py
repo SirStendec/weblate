@@ -30,96 +30,91 @@ class ICUMessageFormatCheckTest(CheckTestCase):
         self.assertFalse(self.check.check_format("string", "string", False, None))
 
     def test_no_formats(self):
-        self.assertFalse(self.check.check_format(
-            "Hello, {name}!",
-            "Hallo, {name}!",
-            False, None
-        ))
-
-    def test_whitespace(self):
-        self.assertFalse(self.check.check_format(
-            "Hello, {  \t name\n  \n}!",
-            "Hallo, {name}!",
-            False, None
-        ))
-
-    def test_missing_placeholder(self):
-        result = self.check.check_format(
-            "Hello, {name}!",
-            "Hallo, Fred!",
-            False, None
+        self.assertFalse(
+            self.check.check_format("Hello, {name}!", "Hallo, {name}!", False, None)
         )
 
-        self.assertDictEqual(result, {
-            'missing': ['name']
-        })
+    def test_whitespace(self):
+        self.assertFalse(
+            self.check.check_format(
+                "Hello, {  \t name\n  \n}!", "Hallo, {name}!", False, None
+            )
+        )
+
+    def test_missing_placeholder(self):
+        result = self.check.check_format("Hello, {name}!", "Hallo, Fred!", False, None)
+
+        self.assertDictEqual(result, {"missing": ["name"]})
 
     def test_extra_placeholder(self):
         result = self.check.check_format(
-            "Hello, {firstName}!",
-            "Hallo, {firstName} {lastName}!",
-            False, None
+            "Hello, {firstName}!", "Hallo, {firstName} {lastName}!", False, None
         )
 
-        self.assertDictEqual(result, {
-            'extra': ['lastName']
-        })
+        self.assertDictEqual(result, {"extra": ["lastName"]})
 
     def test_types(self):
-        self.assertFalse(self.check.check_format(
-            "Cost: {value, number, ::currency/USD}",
-            "Kosten: {value, number, ::currency/USD}",
-            False, None
-        ))
+        self.assertFalse(
+            self.check.check_format(
+                "Cost: {value, number, ::currency/USD}",
+                "Kosten: {value, number, ::currency/USD}",
+                False,
+                None,
+            )
+        )
 
     def test_wrong_types(self):
         result = self.check.check_format(
-            "Cost: {value, number, ::currency/USD}",
-            "Kosten: {value}",
-            False, None
+            "Cost: {value, number, ::currency/USD}", "Kosten: {value}", False, None
         )
 
-        self.assertDictEqual(result, {
-            'wrong_type': ['value']
-        })
+        self.assertDictEqual(result, {"wrong_type": ["value"]})
 
     def test_plural_types(self):
-        self.assertFalse(self.check.check_format(
-            "You have {count, plural, one {# message} other {# messages}}. Yes. {count, number}.",
-            "Sie haben {count, plural, one {# Nachricht} other {# Nachrichten}}. Ja. {count, number}.",
-            False, None
-        ))
+        self.assertFalse(
+            self.check.check_format(
+                "You have {count, plural, one {# message} other {# messages}}. "
+                "Yes. {count, number}.",
+                "Sie haben {count, plural, one {# Nachricht} other "
+                "{# Nachrichten}}. Ja. {count, number}.",
+                False,
+                None,
+            )
+        )
 
     def test_no_other(self):
         result = self.check.check_format(
-            "{count, number}",
-            "{count, plural, one {typo}}",
-            False, None
+            "{count, number}", "{count, plural, one {typo}}", False, None
         )
 
-        self.assertDictEqual(result, {
-            'no_other': ['count']
-        })
+        self.assertDictEqual(result, {"no_other": ["count"]})
 
     def test_bad_plural(self):
         result = self.check.check_format(
-            "{count, number}",
-            "{count, plural, bad {typo} other {okay}}",
-            False, None
+            "{count, number}", "{count, plural, bad {typo} other {okay}}", False, None
         )
 
-        self.assertDictEqual(result, {
-            'bad_plural': [
-                ['count', set(['bad'])]
-            ]
-        })
+        self.assertDictEqual(result, {"bad_plural": [["count", {"bad"}]]})
 
     def test_good_plural(self):
-        self.assertFalse(self.check.check_format(
-            "{count, number}",
-            "{count, plural, zero{#} one{#} two{#} few{#} many{#} other{#} =0{#} =-12{#} =391.5{#}}",
-            False, None
-        ))
+        self.assertFalse(
+            self.check.check_format(
+                "{count, number}",
+                "{count, plural, zero{#} one{#} two{#} few{#} many{#} "
+                "other{#} =0{#} =-12{#} =391.5{#}}",
+                False,
+                None,
+            )
+        )
+
+    def test_check_highlight(self):
+        highlights = self.check.check_highlight(
+            "Hello, <link> {na<>me} </link>. You have {count, plural, one "
+            "{# message} other {# messages}}.",
+            MockUnit("icu_message_format", flags="icu-message-format"),
+        )
+
+        self.assertListEqual(highlights, [[14, 22], [41, 92]])
 
 
 # This is a sub-class of our existing test set because this format is an extension
@@ -128,40 +123,51 @@ class ICUXMLFormatCheckTest(ICUMessageFormatCheckTest):
     check = ICUXMLFormatCheck()
 
     def test_tags(self):
-        self.assertFalse(self.check.check_format(
-            "Hello <user/>! <link>Click here!</link>",
-            "Hallo <user />! <link>Klicke hier!</link>",
-            False, None
-        ))
+        self.assertFalse(
+            self.check.check_format(
+                "Hello <user/>! <link>Click here!</link>",
+                "Hallo <user />! <link>Klicke hier!</link>",
+                False,
+                None,
+            )
+        )
 
     def test_empty_tags(self):
-        self.assertFalse(self.check.check_format(
-            "<empty />",
-            "<empty/><empty></empty>",
-            False, None
-        ))
+        self.assertFalse(
+            self.check.check_format("<empty />", "<empty/><empty></empty>", False, None)
+        )
 
     def test_incorrectly_full_tags(self):
         result = self.check.check_format(
-            "<empty /><full>tag</full>",
-            "<full /><empty>tag</empty>",
-            False, None
+            "<empty /><full>tag</full>", "<full /><empty>tag</empty>", False, None
         )
 
-        self.assertDictEqual(result, {
-            'tag_not_empty': ['<empty>'],
-            'tag_empty': ['<full>']
-        })
+        self.assertDictEqual(
+            result, {"tag_not_empty": ["empty"], "tag_empty": ["full"]}
+        )
 
     def test_tag_vs_placeholder(self):
         result = self.check.check_format(
             "Hello, <bold>{firstName}</bold>.",
             "Hello {bold} <firstName />.",
-            False, None
+            False,
+            None,
         )
 
-        self.assertDictEqual(result, {
-            'wrong_type': ['bold', '<firstName>'],
-            'should_be_tag': ['bold'],
-            'not_tag': ['<firstName>']
-        })
+        self.assertDictEqual(
+            result,
+            {
+                "wrong_type": ["bold", "firstName"],
+                "should_be_tag": ["bold"],
+                "not_tag": ["firstName"],
+            },
+        )
+
+    def test_check_highlight(self):
+        highlights = self.check.check_highlight(
+            "Hello, <link> {na<>me} </link>. You have {count, plural, "
+            "one {# message} other {# messages}}.",
+            MockUnit("icu_xml_format", flags="icu-xml-format"),
+        )
+
+        self.assertListEqual(highlights, [[7, 13], [14, 22], [23, 30], [41, 92]])
