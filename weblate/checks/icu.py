@@ -87,7 +87,7 @@ def check_bad_plural_selector(selector):
     return selector[0] != "="
 
 
-def update_four_value(value, old):
+def update_maybe_value(value, old):
     """
     Certain values on placeholders can have four values.
 
@@ -100,11 +100,9 @@ def update_four_value(value, old):
     This is useful in case there are multiple placeholders with
     conflicting type information.
     """
-    if old is None:
+    if old is None or old == value:
         return value
-    if old != value:
-        return 0
-    return old
+    return 0
 
 
 def extract_placeholders(token, variables=None):
@@ -147,10 +145,12 @@ def extract_placeholders(token, variables=None):
         is_tag = ttype is TAG_TYPE
 
         data["types"].add(ttype)
-        data["is_number"] = update_four_value(ttype in NUMERIC_TYPES, data["is_number"])
-        data["is_tag"] = update_four_value(is_tag, data["is_tag"])
+        data["is_number"] = update_maybe_value(
+            ttype in NUMERIC_TYPES, data["is_number"]
+        )
+        data["is_tag"] = update_maybe_value(is_tag, data["is_tag"])
         if is_tag:
-            data["is_empty"] = update_four_value(
+            data["is_empty"] = update_maybe_value(
                 "contents" not in token or not token["contents"], data["is_empty"]
             )
 
@@ -315,43 +315,6 @@ class BaseICUMessageFormatCheck(BaseFormatCheck):
             elif data["is_tag"]:
                 result["not_tag"].append(name)
 
-    def check_highlight(self, source, unit):
-        if self.should_skip(unit):
-            return []
-
-        _, _, tokens = parse_icu(source, self.allow_tags, True)
-
-        ret = []
-        i = 0
-        start = None
-        tree = []
-
-        for token in tokens:
-            text = token["text"]
-            length = len(text)
-            last = tree[-1] if tree else None
-
-            if token["type"] == "syntax":
-                if text in ["{", "<", "</"]:
-                    tree.append(text)
-                    if start is None:
-                        start = i
-
-                elif (text == "}" and last == "{") or (
-                    (text == ">" or text == "/>") and (last == "<" or last == "</")
-                ):
-                    tree.pop()
-                    if not tree:
-                        ret.append([start, i + length])
-                        start = None
-
-            i += length
-
-        if start is not None:
-            ret.append([start, i])
-
-        return ret
-
     def format_result(self, result):
         if result.get("syntax"):
             yield _("Syntax error: %s") % ", ".join(err.msg for err in result["syntax"])
@@ -396,6 +359,50 @@ class BaseICUMessageFormatCheck(BaseFormatCheck):
             yield _("XML Tag missing contents in translation: %s") % ", ".join(
                 result["tag_empty"]
             )
+
+    def check_highlight(self, source, unit):
+        if self.should_skip(unit):
+            return []
+
+        _, _, tokens = parse_icu(source, self.allow_tags, True)
+
+        ret = []
+        i = 0
+        start = None
+        tree = []
+        src_len = len(source)
+
+        for token in tokens:
+            text = token["text"]
+            length = len(text)
+            last = tree[-1] if tree else None
+
+            if token["type"] == "syntax":
+                if text == "{" or (self.allow_tags and text in ["<", "</"]):
+                    tree.append(text)
+                    if start is None:
+                        start = i
+
+                elif (text == "}" and last == "{") or (
+                    self.allow_tags and text in (">", "/>") and last in ("<", "</")
+                ):
+                    tree.pop()
+                    if not tree:
+                        end = i + length
+                        ret.append((start, end, source[start:end]))
+                        start = None
+
+            i += length
+            if i >= src_len:
+                break
+
+        if i >= src_len:
+            i = length - 1
+
+        if start is not None and start < src_len:
+            ret.append((start, i, source[start:end]))
+
+        return ret
 
 
 class ICUMessageFormatCheck(BaseICUMessageFormatCheck):
