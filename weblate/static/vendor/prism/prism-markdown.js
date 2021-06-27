@@ -86,12 +86,6 @@
 				alias: 'keyword'
 			},
 			{
-				// `code`
-				// ``code``
-				pattern: /``.+?``|`[^`\r\n]+`/,
-				alias: 'keyword'
-			},
-			{
 				// ```optional language
 				// code block
 				// ```
@@ -205,6 +199,7 @@
 		'strike': {
 			// ~~strike through~~
 			// ~strike~
+			// eslint-disable-next-line regexp/strict
 			pattern: createInline(/(~~?)(?:(?!~)<inner>)+\2/.source),
 			lookbehind: true,
 			greedy: true,
@@ -216,6 +211,14 @@
 				},
 				'punctuation': /~~?/
 			}
+		},
+		'code-snippet': {
+			// `code`
+			// ``code``
+			pattern: /(^|[^\\`])(?:``[^`\r\n]+(?:`[^`\r\n]+)*``(?!`)|`[^`\r\n]+`(?!`))/,
+			lookbehind: true,
+			greedy: true,
+			alias: ['code', 'keyword']
 		},
 		'url': {
 			// [example](http://example.com "Optional title")
@@ -248,7 +251,7 @@
 	});
 
 	['url', 'bold', 'italic', 'strike'].forEach(function (token) {
-		['url', 'bold', 'italic', 'strike'].forEach(function (inside) {
+		['url', 'bold', 'italic', 'strike', 'code-snippet'].forEach(function (inside) {
 			if (token !== inside) {
 				Prism.languages.markdown[token].inside.content.inside[inside] = Prism.languages.markdown[inside];
 			}
