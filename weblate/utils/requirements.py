@@ -61,6 +61,7 @@ REQUIRES = [
     "html2text",
     "pycairo",
     "pygobject",
+    "pyicumessageformat",
     "diff-match-patch",
     "requests",
     "django-redis",

@@ -1608,7 +1608,8 @@ a.language:hover {
 .token.function-name,
 .token.constant,
 .token.symbol,
-.token.deleted {
+.token.deleted,
+.token.argument-name {
   color: #c92c2c;
 }
 
@@ -1780,4 +1781,43 @@ a.language:hover {
 .dismiss-all input {
   vertical-align: middle;
   margin: 3px;
+}
+
+.live_preview-tag {
+  display: inline-block;
+  position: relative;
+  padding: 2px 4px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+.live_preview-tag:empty {
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+.live_preview-tag,
+.live_preview-tag:before {
+  background-color: #e0eaf1;
+  border: 1px solid #c2cbd2;
+}
+.live_preview-tag .live_preview-tag,
+.live_preview-tag .live_preview-tag:before {
+  background-color: #b2babf;
+  border-color: #9aa1a6;
+}
+.live_preview-tag:before {
+  font-size: 10px;
+  content: "<" attr(data-tag) ">";
+  border-top: none;
+  white-space: nowrap;
+}
+.live_preview-tag:empty:before {
+  border: none;
+}
+.live_preview-tag:not(:empty):before {
+  position: absolute;
+  top: 100%;
+  right: -1px;
+  transform: translateY(-25%);
+  padding: 0 4px;
+  border-radius: 0 0 8px 8px;
 }

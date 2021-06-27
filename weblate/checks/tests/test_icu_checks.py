@@ -114,10 +114,13 @@ class ICUMessageFormatCheckTest(CheckTestCase):
             MockUnit("icu_message_format", flags="icu-message-format"),
         )
 
-        self.assertListEqual(highlights, [
-            (14, 22, '{na<>me}'),
-            (41, 92, '{count, plural, one {# message} other {# messages}}')
-        ])
+        self.assertListEqual(
+            highlights,
+            [
+                (14, 22, "{na<>me}"),
+                (41, 92, "{count, plural, one {# message} other {# messages}}"),
+            ],
+        )
 
 
 # This is a sub-class of our existing test set because this format is an extension
@@ -173,9 +176,12 @@ class ICUXMLFormatCheckTest(ICUMessageFormatCheckTest):
             MockUnit("icu_xml_format", flags="icu-xml-format"),
         )
 
-        self.assertListEqual(highlights, [
-            (7, 13, '<link>'),
-            (14, 22, '{na<>me}'),
-            (23, 30, '</link>'),
-            (41, 92, '{count, plural, one {# message} other {# messages}}')
-        ])
+        self.assertListEqual(
+            highlights,
+            [
+                (7, 13, "<link>"),
+                (14, 22, "{na<>me}"),
+                (23, 30, "</link>"),
+                (41, 92, "{count, plural, one {# message} other {# messages}}"),
+            ],
+        )

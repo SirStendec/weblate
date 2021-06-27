@@ -12,6 +12,12 @@
 <script defer data-cfasync="false" src="{% static 'editor/base.js' %}{{ cache_param }}"></script>
 <script defer data-cfasync="false" src="{% static 'editor/full.js' %}{{ cache_param }}"></script>
 {% endcompress %}
+{% if show_live_preview %}
+{% compress js %}
+<script defer data-cfasync="false" src="{% static 'vendor/icu-message-format.js' %}{{ cache_param }}"></script>
+<script defer data-cfasync="false" src="{% static 'editor/live_preview.js' %}{{ cache_param }}"></script>
+{% endcompress %}
+{% endif %}
 {% endblock %}
 
 {% block extra_meta %}
@@ -246,6 +252,9 @@
 {% if others.total %}
 <li><a href="#others" data-toggle="tab" id="toggle-others">{% trans "Other occurrences" %} <span class="badge">{{ others.total }}</span></a></li>
 {% endif %}
+{% if show_live_preview %}
+<li><a href="#live_preview" data-toggle="tab" id="toggle-live-preview">{% trans "Live Preview" %} <span class="badge"></span></a></li>
+{% endif %}
 {% if unit.all_comments or user_can_add_comment %}
 <li><a href="#comments" data-toggle="tab" id="toggle-comments">{% trans "Comments" %}{% if unit.all_comments %} <span class="badge">{{ unit.all_comments|length }}</span>{% endif %}</a></li>
 {% endif %}
@@ -378,6 +387,23 @@
     </thead>
     <tbody id="machinery-translations"></tbody>
   </table>
+</div>
+{% endif %}
+
+{% if show_live_preview %}
+<div class="tab-pane" id="live_preview" data-mode="{{ show_live_preview }}">
+    <p>{% trans "Loading…" %}</p>
+    <div class="hidden panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                {% trans "Live Preview" %}
+            </h4>
+        </div>
+        <div class="panel-body">
+            <div class="wrap-text"></div>
+        </div>
+        <form class="panel-body form-horizontal"></form>
+    </div>
 </div>
 {% endif %}
 
