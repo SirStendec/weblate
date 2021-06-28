@@ -169,7 +169,7 @@ def extract_placeholders(token, variables=None):
             # with a plural/selectordinal type.
             if ttype in PLURAL_TYPES:
                 if check_bad_plural_selector(selector):
-                    data.setdefault("bad_plural", set()).add(selector)
+                    data.setdefault("bad_submessage", set()).add(selector)
 
             # Finally, we process the sub-ast for this option.
             extract_placeholders(subast, variables)
@@ -243,15 +243,17 @@ class BaseICUMessageFormatCheck(BaseFormatCheck):
         # First, we check all the variables in the target.
         for name, data in tgt_vars.items():
             self.check_for_other(result, name, data)
-            self.check_bad_plural(result, name, data)
 
             if name in src_vars:
                 src_data = src_vars[name]
 
+                self.check_bad_submessage(result, name, data, src_data)
                 self.check_wrong_type(result, name, data, src_data)
                 self.check_tags(result, name, data, src_data)
 
             else:
+                self.check_bad_submessage(result, name, data, None)
+
                 # The variable does not exist in the source,
                 # which suggests a mistake.
                 result["extra"].append(name)
@@ -272,18 +274,31 @@ class BaseICUMessageFormatCheck(BaseFormatCheck):
         if choices and "other" not in choices:
             result["no_other"].append(name)
 
-    def check_bad_plural(self, result, name, data):
-        """Forward any bad plural keys detected in extraction."""
-        bad = data.get("bad_plural")
+    def check_bad_submessage(self, result, name, data, src_data):
+        """Detect any bad sub-message selectors."""
+        # We start with bad_submessage from extraction, which
+        # checks for bad plural keys.
+        bad = data.get("bad_submessage", set())
+
+        # We also want to check individual select choices.
+        if src_data and "select" in data["types"] and "select" in src_data["types"]:
+            if "choices" in data and "choices" in src_data:
+                choices = data["choices"]
+                src_choices = src_data["choices"]
+
+                for selector in choices:
+                    if selector not in src_choices:
+                        bad.add(selector)
+
         if bad:
-            result["bad_plural"].append([name, bad])
+            result["bad_submessage"].append([name, bad])
 
     def check_wrong_type(self, result, name, data, src_data):
         """Ensure that types match, when possible."""
         # If we're dealing with a number, we want to use
         # special number logic, since numbers work with
         # multiple types.
-        if isinstance(src_data["is_number"], bool):
+        if isinstance(src_data["is_number"], bool) and src_data["is_number"]:
             if src_data["is_number"] != data["is_number"]:
                 result["wrong_type"].append(name)
 
@@ -335,9 +350,9 @@ class BaseICUMessageFormatCheck(BaseFormatCheck):
         if result.get("no_other"):
             yield _("Missing other sub-message for: %s") % ", ".join(result["no_other"])
 
-        if result.get("bad_plural"):
+        if result.get("bad_submessage"):
             yield _("Bad sub-message selectors for: %s") % ", ".join(
-                f"{x[0]} ({x[1]})" for x in result["bad_plural"]
+                f"{x[0]} ({', '.join(x[1])})" for x in result["bad_submessage"]
             )
 
         if result.get("should_be_tag"):
@@ -395,12 +410,6 @@ class BaseICUMessageFormatCheck(BaseFormatCheck):
             i += length
             if i >= src_len:
                 break
-
-        if i >= src_len:
-            i = length - 1
-
-        if start is not None and start < src_len:
-            ret.append((start, i, source[start:end]))
 
         return ret
 
