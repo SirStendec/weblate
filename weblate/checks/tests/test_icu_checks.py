@@ -26,8 +26,62 @@ from weblate.checks.tests.test_checks import CheckTestCase, MockUnit
 class ICUMessageFormatCheckTest(CheckTestCase):
     check = ICUMessageFormatCheck()
 
+    id_hash = "icu_message_format"
+    flags = "icu-message-format"
+
     def test_plain(self):
         self.assertFalse(self.check.check_format("string", "string", False, None))
+
+    def test_plain_source(self):
+        self.assertFalse(
+            self.check.check_format(
+                "string",
+                "string",
+                False,
+                MockUnit(
+                    self.id_hash, flags=self.flags, source="string", is_source=True
+                ),
+            )
+        )
+
+    def test_malformed(self):
+        result = self.check.check_format("Hello, {name}!", "Hello, {name!", False, None)
+
+        self.assertTrue(result)
+        self.assertTrue("syntax" in result)
+        syntax = result["syntax"]
+        self.assertTrue(isinstance(syntax, list) and len(syntax) == 1)
+        self.assertTrue("Expected , or }" in syntax[0].msg)
+
+    def test_malformed_source(self):
+        # When dealing with a translation and not the source,
+        # any source issue is silently discarded.
+        self.assertFalse(
+            self.check.check_format("Hello, {name!", "Hello, {name}!", False, None)
+        )
+
+        # However, if the unit is_source, we return syntax errors.
+        result = self.check.check_format(
+            "Hello, {name!",
+            "Hello, {name}!",
+            False,
+            MockUnit(
+                self.id_hash, flags=self.flags, source="Hello, {name!", is_source=True
+            ),
+        )
+
+        self.assertTrue(result)
+        self.assertTrue("syntax" in result)
+        syntax = result["syntax"]
+        self.assertTrue(isinstance(syntax, list) and len(syntax) == 1)
+        self.assertTrue("Expected , or }" in syntax[0].msg)
+
+    def test_source(self):
+        self.assertFalse(self.check.check_source_unit([""], None))
+        self.assertFalse(self.check.check_source_unit(["Hello, {name}!"], None))
+
+    def test_bad_source(self):
+        self.assertTrue(self.check.check_source_unit(["Hello, {name!"], None))
 
     def test_no_formats(self):
         self.assertFalse(
@@ -70,6 +124,13 @@ class ICUMessageFormatCheckTest(CheckTestCase):
 
         self.assertDictEqual(result, {"wrong_type": ["value"]})
 
+    def test_more_wrong_types(self):
+        result = self.check.check_format(
+            "Cost: {value, foo}", "Kosten: {value, bar}", False, None
+        )
+
+        self.assertDictEqual(result, {"wrong_type": ["value"]})
+
     def test_plural_types(self):
         self.assertFalse(
             self.check.check_format(
@@ -89,12 +150,28 @@ class ICUMessageFormatCheckTest(CheckTestCase):
 
         self.assertDictEqual(result, {"no_other": ["count"]})
 
+    def test_random_submessage(self):
+        inp = "{count, test, one {yes} other {no}}"
+        self.assertFalse(self.check.check_format(inp, inp, False, None))
+
+    def test_bad_select(self):
+        result = self.check.check_format(
+            "{pronoun,select,hehim{}sheher{}other{}}",
+            "{pronoun,select,he{}sheeher{}other{}}",
+            False,
+            None,
+        )
+
+        self.assertDictEqual(
+            result, {"bad_submessage": [["pronoun", {"he", "sheeher"}]]}
+        )
+
     def test_bad_plural(self):
         result = self.check.check_format(
             "{count, number}", "{count, plural, bad {typo} other {okay}}", False, None
         )
 
-        self.assertDictEqual(result, {"bad_plural": [["count", {"bad"}]]})
+        self.assertDictEqual(result, {"bad_submessage": [["count", {"bad"}]]})
 
     def test_good_plural(self):
         self.assertFalse(
@@ -111,7 +188,7 @@ class ICUMessageFormatCheckTest(CheckTestCase):
         highlights = self.check.check_highlight(
             "Hello, <link> {na<>me} </link>. You have {count, plural, one "
             "{# message} other {# messages}}.",
-            MockUnit("icu_message_format", flags="icu-message-format"),
+            MockUnit(self.id_hash, flags=self.flags),
         )
 
         self.assertListEqual(
@@ -122,11 +199,29 @@ class ICUMessageFormatCheckTest(CheckTestCase):
             ],
         )
 
+    def test_check_error_highlight(self):
+        highlights = self.check.check_highlight(
+            "Hello, {name}! You have {count,number",
+            MockUnit(self.id_hash, flags=self.flags),
+        )
+
+        self.assertListEqual(highlights, [(7, 13, "{name}")])
+
+    def test_check_no_highlight(self):
+        highlights = self.check.check_highlight(
+            "Hello, {name}!", MockUnit("java_format", flags="java-format")
+        )
+
+        self.assertListEqual(highlights, [])
+
 
 # This is a sub-class of our existing test set because this format is an extension
 # of the other format and it should handle all existing syntax properly.
 class ICUXMLFormatCheckTest(ICUMessageFormatCheckTest):
     check = ICUXMLFormatCheck()
+
+    id_hash = "icu_xml_format"
+    flags = "icu-xml-format"
 
     def test_tags(self):
         self.assertFalse(
@@ -163,7 +258,7 @@ class ICUXMLFormatCheckTest(ICUMessageFormatCheckTest):
         self.assertDictEqual(
             result,
             {
-                "wrong_type": ["bold", "firstName"],
+                "wrong_type": ["firstName"],
                 "should_be_tag": ["bold"],
                 "not_tag": ["firstName"],
             },
@@ -173,7 +268,7 @@ class ICUXMLFormatCheckTest(ICUMessageFormatCheckTest):
         highlights = self.check.check_highlight(
             "Hello, <link> {na<>me} </link>. You have {count, plural, "
             "one {# message} other {# messages}}.",
-            MockUnit("icu_xml_format", flags="icu-xml-format"),
+            MockUnit(self.id_hash, flags=self.flags),
         )
 
         self.assertListEqual(
