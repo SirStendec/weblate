@@ -1312,6 +1312,16 @@ class Unit(FastDeleteModelMixin, models.Model, LoggerMixin):
             return "html"
         return "none"
 
+    @cached_property
+    def live_preview(self):
+        """Returns the mode for Live Preview, or None if not supported."""
+        flags = self.all_flags
+        if "icu-message-format" in flags:
+            return "icu-message-format"
+        if "icu-xml-format" in flags:
+            return "icu-xml-format"
+        return None
+
     def get_secondary_units(self, user):
         """Return list of secondary units."""
         secondary_langs = user.profile.secondary_languages.exclude(

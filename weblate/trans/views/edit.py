@@ -75,16 +75,6 @@ from weblate.utils.views import (
     show_form_errors,
 )
 
-LIVE_PREVIEW_FLAGS = ["icu-message-format", "icu-xml-format"]
-
-
-def show_live_preview(unit):
-    if unit:
-        for flag in LIVE_PREVIEW_FLAGS:
-            if flag in unit.all_flags:
-                return flag
-    return None
-
 
 def parse_params(request, project, component, lang):
     """Parses base object and unit set from request."""
@@ -626,7 +616,7 @@ def translate(request, project, component, lang):  # noqa: C901
             "unit": unit,
             "nearby": unit.nearby(request.user.profile.nearby_strings),
             "nearby_keys": unit.nearby_keys(request.user.profile.nearby_strings),
-            "show_live_preview": show_live_preview(unit),
+            "live_preview": unit.live_preview,
             "others": get_other_units(unit),
             "search_url": search_result["url"],
             "search_items": search_result["items"],

@@ -12,7 +12,7 @@
 <script defer data-cfasync="false" src="{% static 'editor/base.js' %}{{ cache_param }}"></script>
 <script defer data-cfasync="false" src="{% static 'editor/full.js' %}{{ cache_param }}"></script>
 {% endcompress %}
-{% if show_live_preview %}
+{% if live_preview %}
 {% compress js %}
 <script defer data-cfasync="false" src="{% static 'vendor/icu-message-format.js' %}{{ cache_param }}"></script>
 <script defer data-cfasync="false" src="{% static 'editor/live_preview.js' %}{{ cache_param }}"></script>
@@ -252,7 +252,7 @@
 {% if others.total %}
 <li><a href="#others" data-toggle="tab" id="toggle-others">{% trans "Other occurrences" %} <span class="badge">{{ others.total }}</span></a></li>
 {% endif %}
-{% if show_live_preview %}
+{% if live_preview %}
 <li><a href="#live_preview" data-toggle="tab" id="toggle-live-preview">{% trans "Live Preview" %} <span class="badge"></span></a></li>
 {% endif %}
 {% if unit.all_comments or user_can_add_comment %}
@@ -390,8 +390,8 @@
 </div>
 {% endif %}
 
-{% if show_live_preview %}
-<div class="tab-pane" id="live_preview" data-mode="{{ show_live_preview }}">
+{% if live_preview %}
+<div class="tab-pane" id="live_preview" data-mode="{{ live_preview }}">
     <p>{% trans "Loading…" %}</p>
     <div class="hidden panel panel-default">
         <div class="panel-heading">
