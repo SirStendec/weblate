@@ -221,11 +221,16 @@ ICU MessageFormat
 
 *Syntax errors and/or placeholders that do not match source*
 
-.. hint::
+This check has support for both pure ICU MessageFormat and ICU with simple XML tags.
 
-    This check is for use with software that does not have special handling
-    for XML tags in ICU MessageFormat strings. If your software *does* have
-    support, you should use :ref:`check-icu-xml-format` instead.
+You can configure the behavior of the ICU MessageFormat check by using the
+``icu-flags:*`` directive, either by opting into XML tag support or by disabling
+certain sub-checks. For example, the following tag enables XML support while
+disabling validation of plural sub-messages:
+
+.. code-block:: text
+
+  icu-message-format, icu-flags:xml:-plural_selectors
 
 +------------------------+------------------------------------------------------------+
 | Interpolation          | ``You have {count, plural, one {# pie} other {# pies}}.``  |
@@ -233,29 +238,34 @@ ICU MessageFormat
 | Flag to enable         | `icu-message-format`                                       |
 +------------------------+------------------------------------------------------------+
 
++------------------------+------------------------------------------------------------+
+| ICU Flags              | These are all flags that can be used with ``icu-flags:*``  |
++------------------------+------------------------------------------------------------+
+| `xml`                  | Enable support for simple XML tags                         |
++------------------------+------------------------------------------------------------+
+| `-highlight`           | Disable highlighting placeholders in the editor.           |
++------------------------+------------------------------------------------------------+
+| `-require_other`       | Disable requiring sub-messages to have an "other" selector |
++------------------------+------------------------------------------------------------+
+| `-submessage_selectors`| Skip checking that sub-message selectors match the         |
+|                        | source.                                                    |
++------------------------+------------------------------------------------------------+
+| `-types`               | Skip checking that placeholder types match the source.     |
++------------------------+------------------------------------------------------------+
+| `-tags`                | Skip checking that XML tags match the source. Tag          |
+|                        | checking requires `xml` is also enabled to work correctly. |
++------------------------+------------------------------------------------------------+
+| `-extra`               | Skip checking that no placeholders are present that        |
+|                        | were not in the source string.                             |
++------------------------+------------------------------------------------------------+
+| `-missing`             | Skip checking that no placeholders are missing that        |
+|                        | were present in the source string.                         |
++------------------------+------------------------------------------------------------+
+
 .. seealso::
 
     :ref:`check-formats`,
-    `ICU: Formatting Messages <https://unicode-org.github.io/icu/userguide/format_parse/messages/>`_
-    `Format.JS: Message Syntax <https://formatjs.io/docs/core-concepts/icu-syntax/>`_
-
-.. _check-icu-xml-format:
-
-ICU MessageFormat with Simple XML
-*********************************
-
-*Syntax errors and/or placeholders that do not match source*
-
-+------------------------+------------------------------------------------------------+
-| Interpolation          | ``Price: <bold>{price, number, ::currency/USD}</bold>``    |
-+------------------------+------------------------------------------------------------+
-| Flag to enable         | `icu-xml-format`                                           |
-+------------------------+------------------------------------------------------------+
-
-.. seealso::
-
-    :ref:`check-formats`,
-    `ICU: Formatting Messages <https://unicode-org.github.io/icu/userguide/format_parse/messages/>`_
+    `ICU: Formatting Messages <https://unicode-org.github.io/icu/userguide/format_parse/messages/>`_,
     `Format.JS: Message Syntax <https://formatjs.io/docs/core-concepts/icu-syntax/>`_
 
 .. _check-i18next-interpolation:

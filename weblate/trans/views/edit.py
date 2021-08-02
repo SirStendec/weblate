@@ -617,6 +617,7 @@ def translate(request, project, component, lang):  # noqa: C901
             "nearby": unit.nearby(request.user.profile.nearby_strings),
             "nearby_keys": unit.nearby_keys(request.user.profile.nearby_strings),
             "live_preview": unit.live_preview,
+            "live_preview_defaults": unit.live_preview_defaults,
             "others": get_other_units(unit),
             "search_url": search_result["url"],
             "search_items": search_result["items"],

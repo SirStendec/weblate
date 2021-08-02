@@ -108,14 +108,10 @@ Parsers["icu-message-format"] = {
   extract,
 };
 
-Parsers["icu-xml-format"] = {
+Parsers["icu-message-format+xml"] = {
   parse(input, tokens) {
     return fmParse(input, { tagsType: TAG_TYPE, tokens });
   },
   interpret,
   extract,
-  _original: {
-    parse: fmParse,
-    interpret: fmInterpret,
-  },
 };

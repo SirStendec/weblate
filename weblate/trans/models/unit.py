@@ -1300,7 +1300,7 @@ class Unit(FastDeleteModelMixin, models.Model, LoggerMixin):
     def edit_mode(self):
         """Returns syntax higlighting mode for Prismjs."""
         flags = self.all_flags
-        if "icu-message-format" in flags or "icu-xml-format" in flags:
+        if "icu-message-format" in flags:
             return "icu-message-format"
         if "rst-text" in flags:
             return "rest"
@@ -1317,10 +1317,19 @@ class Unit(FastDeleteModelMixin, models.Model, LoggerMixin):
         """Returns the mode for Live Preview, or None if not supported."""
         flags = self.all_flags
         if "icu-message-format" in flags:
+            if "icu-flags" in flags:
+                if "xml" in flags.get_value("icu-flags"):
+                    return "icu-message-format+xml"
             return "icu-message-format"
-        if "icu-xml-format" in flags:
-            return "icu-xml-format"
         return None
+
+    @cached_property
+    def live_preview_defaults(self):
+        """Returns default values for Live Preview, or an empty string if none set."""
+        flags = self.all_flags
+        if flags.has_value("lp-defaults"):
+            return flags.get_value("lp-defaults")
+        return ""
 
     def get_secondary_units(self, user):
         """Return list of secondary units."""

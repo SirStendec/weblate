@@ -1782,7 +1782,9 @@ a.language:hover {
   vertical-align: middle;
   margin: 3px;
 }
-
+#live_preview .pagination {
+  justify-content: center;
+}
 .live_preview-tag {
   display: inline-block;
   position: relative;

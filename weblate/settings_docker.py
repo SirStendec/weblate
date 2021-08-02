@@ -976,7 +976,6 @@ CHECK_LIST = [
     "weblate.checks.format.ESTemplateLiteralsCheck",
     "weblate.checks.angularjs.AngularJSInterpolationCheck",
     "weblate.checks.icu.ICUMessageFormatCheck",
-    "weblate.checks.icu.ICUXMLFormatCheck",
     "weblate.checks.qt.QtFormatCheck",
     "weblate.checks.qt.QtPluralCheck",
     "weblate.checks.ruby.RubyFormatCheck",

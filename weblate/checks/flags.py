@@ -73,6 +73,10 @@ TYPED_FLAGS["replacements"] = gettext_lazy("Replacements while rendering")
 TYPED_FLAGS_ARGS["replacements"] = multi_value_flag(str, modulo=2)
 TYPED_FLAGS["variant"] = gettext_lazy("String variant")
 TYPED_FLAGS_ARGS["variant"] = single_value_flag(str)
+TYPED_FLAGS["icu-flags"] = gettext_lazy("ICU MessageFormat Flags")
+TYPED_FLAGS_ARGS["icu-flags"] = multi_value_flag(str)
+TYPED_FLAGS["lp-defaults"] = gettext_lazy("LivePreview Defaults")
+TYPED_FLAGS_ARGS["lp-defaults"] = single_value_flag(str)
 
 IGNORE_CHECK_FLAGS = {CHECKS[x].ignore_string for x in CHECKS}
 
