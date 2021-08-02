@@ -158,7 +158,7 @@ LICENSES = (
     (
         "Apache-2.0",
         "Apache License 2.0",
-        "http://www.apache.org/licenses/LICENSE-2.0",
+        "https://www.apache.org/licenses/LICENSE-2.0",
         True,
     ),
     (
@@ -526,6 +526,12 @@ LICENSES = (
         False,
     ),
     (
+        "CDLA-Permissive-2.0",
+        "Community Data License Agreement Permissive 2.0",
+        "https://cdla.dev/permissive-2-0",
+        False,
+    ),
+    (
         "CDLA-Sharing-1.0",
         "Community Data License Agreement Sharing 1.0",
         "https://cdla.io/sharing-1-0",
@@ -571,6 +577,12 @@ LICENSES = (
         "CC-BY-2.0",
         "Creative Commons Attribution 2.0 Generic",
         "https://creativecommons.org/licenses/by/2.0/legalcode",
+        False,
+    ),
+    (
+        "CC-BY-2.5-AU",
+        "Creative Commons Attribution 2.5 Australia",
+        "https://creativecommons.org/licenses/by/2.5/au/legalcode",
         False,
     ),
     (
@@ -1337,12 +1349,7 @@ LICENSES = (
         False,
     ),
     ("IPA", "IPA Font License", "https://opensource.org/licenses/IPA", True),
-    (
-        "ISC",
-        "ISC License",
-        "https://www.isc.org/downloads/software-support-policy/isc-license/",
-        True,
-    ),
+    ("ISC", "ISC License", "https://www.isc.org/licenses/", True),
     (
         "JPNIC",
         "Japan Network Information Center License",
@@ -1528,7 +1535,7 @@ LICENSES = (
         "http://www.mozilla.org/MPL/MPL-1.1.html",
         True,
     ),
-    ("MPL-2.0", "Mozilla Public License 2.0", "http://www.mozilla.org/MPL/2.0/", True),
+    ("MPL-2.0", "Mozilla Public License 2.0", "https://www.mozilla.org/MPL/2.0/", True),
     (
         "MPL-2.0-no-copyleft-exception",
         "Mozilla Public License 2.0 (no copyleft exception)",
@@ -1649,8 +1656,14 @@ LICENSES = (
     ),
     (
         "NLOD-1.0",
-        "Norwegian Licence for Open Government Data",
+        "Norwegian Licence for Open Government Data (NLOD) 1.0",
         "http://data.norge.no/nlod/en/1.0",
+        False,
+    ),
+    (
+        "NLOD-2.0",
+        "Norwegian Licence for Open Government Data (NLOD) 2.0",
+        "http://data.norge.no/nlod/en/2.0",
         False,
     ),
     ("Noweb", "Noweb License", "https://fedoraproject.org/wiki/Licensing/Noweb", False),
@@ -1834,6 +1847,12 @@ LICENSES = (
         "OPL-1.0",
         "Open Public License v1.0",
         "http://old.koalateam.com/jackaroo/OPL_1_0.TXT",
+        False,
+    ),
+    (
+        "OPUBL-1.0",
+        "Open Publication License v1.0",
+        "http://opencontent.org/openpub/",
         False,
     ),
     (

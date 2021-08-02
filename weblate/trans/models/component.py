@@ -87,7 +87,7 @@ from weblate.utils.celery import get_task_progress, is_task_ready
 from weblate.utils.colors import COLOR_CHOICES
 from weblate.utils.db import FastDeleteModelMixin, FastDeleteQuerySetMixin
 from weblate.utils.errors import report_error
-from weblate.utils.fields import JSONField
+from weblate.utils.fields import EmailField, JSONField
 from weblate.utils.licenses import get_license_choices, get_license_url, is_libre
 from weblate.utils.lock import WeblateLock, WeblateLockTimeout
 from weblate.utils.render import (
@@ -302,13 +302,12 @@ class Component(FastDeleteModelMixin, models.Model, URLMixin, PathMixin, CacheKe
         ),
         blank=True,
     )
-    report_source_bugs = models.EmailField(
+    report_source_bugs = EmailField(
         verbose_name=gettext_lazy("Source string bug reporting address"),
         help_text=gettext_lazy(
             "E-mail address for reports on errors in source strings. "
             "Leave empty for no e-mails."
         ),
-        max_length=254,
         blank=True,
     )
     branch = models.CharField(
@@ -1619,15 +1618,16 @@ class Component(FastDeleteModelMixin, models.Model, URLMixin, PathMixin, CacheKe
 
         return True
 
-    def handle_parse_error(self, error, translation=None):
+    def handle_parse_error(self, error, translation=None, filename=None):
         """Handler for parse errors."""
         error_message = getattr(error, "strerror", "")
         if not error_message:
             error_message = str(error).replace(self.full_path, "")
-        if translation is None:
-            filename = self.template
-        else:
-            filename = translation.filename
+        if filename is None:
+            if translation is None:
+                filename = self.template
+            else:
+                filename = translation.filename
         self.trigger_alert("ParseError", error=error_message, filename=filename)
         if self.id:
             Change.objects.create(
@@ -2865,7 +2865,7 @@ class Component(FastDeleteModelMixin, models.Model, URLMixin, PathMixin, CacheKe
         try:
             return self.load_intermediate_store()
         except Exception as exc:
-            self.handle_parse_error(exc)
+            self.handle_parse_error(exc, filename=self.intermediate)
 
     def load_template_store(self, fileobj=None):
         """Load translate-toolkit store for template."""
@@ -2885,7 +2885,7 @@ class Component(FastDeleteModelMixin, models.Model, URLMixin, PathMixin, CacheKe
             return self.load_template_store()
         except Exception as error:
             report_error(cause="Template parse error")
-            self.handle_parse_error(error)
+            self.handle_parse_error(error, filename=self.template)
 
     @cached_property
     def all_flags(self):

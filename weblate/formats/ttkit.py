@@ -51,6 +51,7 @@ from weblate.formats.base import (
     TranslationUnit,
     UpdateError,
 )
+from weblate.lang.data import FORMULA_WITH_ZERO, ZERO_PLURAL_TYPES
 from weblate.trans.util import (
     get_clean_env,
     get_string,
@@ -202,10 +203,6 @@ class KeyValueUnit(TTKitUnit):
             return not self.unit.isfuzzy() and self.unit.value != ""
         return self.unit.istranslated()
 
-    def set_target(self, target):
-        """Set translation unit target."""
-        super().set_target(target)
-
 
 class TTKitFormat(TranslationFormat):
     unit_class = TTKitUnit
@@ -335,8 +332,11 @@ class TTKitFormat(TranslationFormat):
             # Setting source on LISAunit will make it use default language
             unit = self.store.UnitClass(None)
             unit.setsource(source, self.source_language)
-            return unit
-        return self.store.UnitClass(source)
+        else:
+            unit = self.store.UnitClass(source)
+        # Needed by some formats (Android) to set target
+        unit._store = self.store
+        return unit
 
     def create_unit_key(
         self, key: str, source: Union[str, List[str], multistring]
@@ -601,6 +601,12 @@ class XliffUnit(TTKitUnit):
             return ""
 
         return rich_to_xliff_string(self.unit.rich_target)
+
+    def _invalidate_target(self):
+        """Invalidate target cache."""
+        super()._invalidate_target()
+        if "xliff_node" in self.__dict__:
+            del self.__dict__["xliff_node"]
 
     def set_target(self, target):
         """Set translation unit target."""
@@ -1090,7 +1096,7 @@ class XliffFormat(TTKitFormat):
     name = _("XLIFF translation file")
     format_id = "xliff"
     loader = xlifffile
-    autoload: Tuple[str, ...] = ("*.xlf", "*.xliff")
+    autoload: Tuple[str, ...] = ("*.xlf", "*.xliff", "*.sdlxliff", "*.mxliff")
     unit_class = XliffUnit
     language_format = "bcp"
 
@@ -1254,6 +1260,7 @@ class RESXFormat(TTKitFormat):
     unit_class = RESXUnit
     new_translation = RESXFile.XMLskeleton
     autoload = ("*.resx",)
+    language_format = "bcp"
 
 
 class AndroidFormat(TTKitFormat):
@@ -1782,3 +1789,41 @@ class PropertiesMi18nFormat(PropertiesUtf8Format):
     language_format = "java"
     check_flags = ("es-format",)
     monolingual = True
+
+
+class StringsdictFormat(TTKitFormat):
+    name = _("Stringsdict file")
+    format_id = "stringsdict"
+    loader = ("stringsdict", "StringsDictFile")
+    unit_class = MonolingualSimpleUnit
+    autoload: Tuple[str, ...] = ("*.stringsdict",)
+    new_translation = """<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+    </dict>
+</plist>
+"""  # noqa: E501
+
+    @staticmethod
+    def mimetype():
+        """Return most common media type for format."""
+        return "application/xml"
+
+    @staticmethod
+    def extension():
+        """Return most common file extension for format."""
+        return "stringsdict"
+
+    def get_plural(self, language):
+        """Return matching plural object."""
+        plural = super().get_plural(language)
+        if plural.type in ZERO_PLURAL_TYPES:
+            return plural
+
+        from weblate.lang.models import Plural
+
+        return language.plural_set.get_or_create(
+            source=Plural.SOURCE_STRINGSDICT,
+            defaults={"formula": FORMULA_WITH_ZERO[plural.formula]},
+        )[0]

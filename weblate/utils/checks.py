@@ -443,6 +443,7 @@ def check_site(app_configs, **kwargs):
 
 def check_perms(app_configs=None, **kwargs):
     """Check that the data dir can be written to."""
+    start = time.time()
     errors = []
     uid = os.getuid()
     message = "The path {} is owned by a different user, check your DATA_DIR settings."
@@ -468,6 +469,8 @@ def check_perms(app_configs=None, **kwargs):
                 raise
             if stat.st_uid != uid:
                 errors.append(weblate_check("weblate.E027", message.format(path)))
+        if time.time() - start > 15:
+            break
 
     return errors
 

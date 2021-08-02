@@ -1,12 +1,37 @@
-Weblate 4.7.1
+Weblate 4.8
 -------------
 
 Not yet released.
+
+* Added support for Apple stringsdict format.
+* The exact search opearator is now case-sensitive on PostgreSQL.
+
+`All changes in detail <https://github.com/WeblateOrg/weblate/milestone/67?closed=1>`__.
+
+Weblate 4.7.2
+-------------
+
+Released on July 15th 2021.
+
+* Support more language aliases to be configured on a project.
+* Fixed search string validation in API.
+* Fixed Git exporter URLs after a domain change.
+* Fixed cleanup addon for Windows RC files.
+* Fixed possible crash on Xliff updating.
+
+`All changes in detail <https://github.com/WeblateOrg/weblate/milestone/69?closed=1>`__.
+
+Weblate 4.7.1
+-------------
+
+Released on June 30th 2021.
 
 * Improved popup for adding terms to glossary.
 * Added support for LibreTranslate machine translation service.
 * Added rate limiting on creating new projects.
 * Improved performance of file updates.
+
+`All changes in detail <https://github.com/WeblateOrg/weblate/milestone/68?closed=1>`__.
 
 Weblate 4.7
 -----------

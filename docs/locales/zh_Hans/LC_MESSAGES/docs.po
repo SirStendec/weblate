@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Weblate\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-06-16 20:41+0200\n"
-"PO-Revision-Date: 2021-06-21 11:33+0000\n"
+"PO-Revision-Date: 2021-07-25 15:45+0000\n"
 "Last-Translator: JY3 <GeeyunJY3@gmail.com>\n"
 "Language-Team: Chinese (Simplified) <https://hosted.weblate.org/projects/"
 "weblate/documentation/zh_Hans/>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.7\n"
+"X-Generator: Weblate 4.7.2-dev\n"
 "Generated-By: Babel 2.8.0\n"
 
 #: ../../admin/access.rst:4 ../../admin/projects.rst:180
@@ -232,11 +232,11 @@ msgstr "可以管理翻译语言（添加或删除翻译）。"
 #: ../../admin/access.rst:108 ../../admin/access.rst:480 ../../api.rst:2298
 #: ../../user/glossary.rst:4 ../../user/translating.rst:270
 msgid "Glossary"
-msgstr "词汇表"
+msgstr "语汇表"
 
 #: ../../admin/access.rst:108
 msgid "Can manage glossary (add or remove entries, also upload)."
-msgstr "可以管理词汇表（添加或删除条目，并上传）。"
+msgstr "可以管理语汇表（添加或删除条目，并上传）。"
 
 #: ../../admin/access.rst:111
 msgid "Memory"
@@ -289,6 +289,8 @@ msgid ""
 "``Project@Group``, also displayed in the Django admin interface this way. "
 "Although they can’t be edited from Weblate user-interface."
 msgstr ""
+"对于非“自定义”访问控制，实际上为每个项目定义了上述每个群组的实例。 这些组的实际名称将是“Project@Group”，也以这种方式显示在 "
+"Django 管理界面中。 尽管无法从 Weblate 用户界面编辑它们。"
 
 #: ../../admin/access.rst:136
 msgid ""
@@ -347,11 +349,11 @@ msgid ""
 "In case some users behave badly in your project, you have an option to block "
 "them from contributing. The blocked user still will be able to see the "
 "project if he has permissions for that, but he won't be able to contribute."
-msgstr ""
+msgstr "如果有些用户在您的项目中行为不佳，您可以选择阻止他们进行贡献。 如果被阻止的用户有权限，那他仍然可以看到项目，但他将不能贡献。"
 
 #: ../../admin/access.rst:177
 msgid "Per-project permission management"
-msgstr "每项目的权限管理"
+msgstr "基于权限管理"
 
 #: ../../admin/access.rst:179
 msgid ""
@@ -378,19 +380,19 @@ msgid ""
 "superuser privilege. In order to do so, add them to the `Administration` "
 "group of the project."
 msgstr ""
+"通过Weblate用户界面管理权限的一个主要好处是，您可以将其委托给其他用户，而无需授予他们超级用户权限。 "
+"为此，将它们添加到项目的“Administration”组中。"
 
 #: ../../admin/access.rst:196
 msgid "Custom access control"
-msgstr "客户访问控制"
+msgstr "自定义访问控制"
 
 #: ../../admin/access.rst:200
 msgid ""
 "The permission system is based on groups and roles, where roles define a set "
 "of permissions, and groups link them to users and translations, see :ref:"
 "`auth-model` for more details."
-msgstr ""
-"权限系统基于组和角色，其中角色定义了一组权限，组将它们链接到用户和翻译，请参"
-"阅 :ref:`auth-model` 以获取更多详细信息。"
+msgstr "权限系统基于组和角色，其中角色定义了一组权限，组将它们链接到用户和翻译，请参阅:ref: ' auth-model '获取更多详细信息。"
 
 #: ../../admin/access.rst:204
 msgid ""
@@ -400,6 +402,9 @@ msgid ""
 "necessarily have to switch it to `Custom` :ref:`access control <acl>` to "
 "utilize it. However you must have superuser privileges in order to use it."
 msgstr ""
+"Weblate访问控制系统最强大的功能目前只能通过:ref: ' Django admin interface <admin-interface> "
+"'来实现。 您可以使用它来管理任何项目的权限。 你不一定要切换到' Custom ':ref: ' access control <acl> '来使用它。"
+" 但是你必须有超级用户权限才能使用它。"
 
 #: ../../admin/access.rst:210
 msgid ""
@@ -418,35 +423,35 @@ msgstr "通用设置"
 msgid ""
 "This section contains an overview of some common configurations you may be "
 "interested in."
-msgstr "此部分包含了一些您可能感兴趣的常用配置选项的概览。"
+msgstr "本节包含一些您可能感兴趣的常见配置的概述。"
 
 #: ../../admin/access.rst:222
 msgid "Site-wide permission management"
-msgstr "站点范围的权限管理"
+msgstr "站点范围内的权限管理"
 
 #: ../../admin/access.rst:224
 msgid ""
 "To manage permissions for a whole instance at once, add users to "
 "appropriate :ref:`default groups <default-groups>`:"
-msgstr ""
+msgstr "要一次性管理整个实例的权限，请将用户添加到适当的组：如：“默认组<default-groups>”："
 
 #: ../../admin/access.rst:227
 msgid ""
 "`Users` (this is done by default by the :ref:`automatic group assignment "
 "<autogroup>`)."
-msgstr ""
+msgstr "“Users”（控件默认执行此操作：ref:`automatic group assignment <autogroup>`）。"
 
 #: ../../admin/access.rst:229
 msgid ""
 "`Reviewers` (if you are using :ref:`review workflow <reviews>` with "
 "dedicated reviewers)."
-msgstr ""
+msgstr "“Reviewers”（如果您使用:ref: ' review workflow <reviews> '，那么将会有专门的评审人员）。"
 
 #: ../../admin/access.rst:231
 msgid ""
 "`Managers` (if you want to delegate most of the management operations to "
 "somebody else)."
-msgstr ""
+msgstr "“Managers”（如果您想把大部分的管理操作委托给别人）。"
 
 #: ../../admin/access.rst:234
 msgid ""
@@ -454,13 +459,15 @@ msgid ""
 "otherwise the site-wide permissions provided by membership in the `Users` "
 "and `Reviewers` groups won’t have any effect."
 msgstr ""
+"您应该将所有项目配置为' Public '(参见:ref: ' acl ')，否则' Users '和' reviewer "
+"'组成员提供的站点范围权限将不起任何作用。"
 
 #: ../../admin/access.rst:238
 msgid ""
 "You may also grant some additional permissions of your choice to the default "
 "groups. For example, you may want to give a permission to manage screenshots "
 "to all the `Users`."
-msgstr ""
+msgstr "您还可以将您所选择的一些额外权限授予默认组。 例如，你可能想给所有的“用户”一个管理截图的权限。"
 
 #: ../../admin/access.rst:242
 msgid ""
@@ -469,10 +476,12 @@ msgid ""
 "the :guilabel:`Project selection` (e.g. :guilabel:`All projects` or :"
 "guilabel:`All public projects`)."
 msgstr ""
+"您还可以定义一些新的自定义组。如果希望继续在站点范围内管理这些组的权限，请为gui标签选择一个合适的值：`Project selection` ("
+"e.g. :guilabel:`All projects` or :guilabel:`All public projects`)."
 
 #: ../../admin/access.rst:248
 msgid "Custom permissions for languages, components or projects"
-msgstr "自定义语言、组件或项目权限"
+msgstr "语言、组件或项目的自定义权限"
 
 #: ../../admin/access.rst:250
 msgid ""
@@ -499,7 +508,7 @@ msgid ""
 "If you want (for whatever reason) to allow translation to a specific "
 "language (lets say `Czech`) only to a closed set of reliable translators "
 "while keeping translations to other languages public, you will have to:"
-msgstr ""
+msgstr "如果你想要(不管出于什么原因)只允许翻译到特定语言(比如“捷克语”)，而将其他语言的翻译保持公开，你必须:"
 
 #: ../../admin/access.rst:261
 msgid ""
@@ -507,6 +516,8 @@ msgid ""
 "default configuration this can be done by altering the `Users` :ref:`default "
 "group <default-groups>`."
 msgstr ""
+"删除所有用户翻译“捷克语”的权限。 在默认配置中，这可以通过修改' Users ':ref: ' default group <default-"
+"groups> '来实现。"
 
 #: ../../admin/access.rst:265
 msgid "Group `Users`"
@@ -518,19 +529,19 @@ msgstr "语言选择"
 
 #: ../../admin/access.rst:269 ../../admin/access.rst:285
 msgid "`As defined`"
-msgstr "`按所指定`"
+msgstr "`定义`"
 
 #: ../../admin/access.rst:271
 msgid "All but `Czech`"
-msgstr ""
+msgstr "除了“捷克”"
 
 #: ../../admin/access.rst:275
 msgid "Add a dedicated group for `Czech` translators."
-msgstr ""
+msgstr "为“捷克语”翻译添加一个专门的小组。"
 
 #: ../../admin/access.rst:277
 msgid "Group `Czech translators`"
-msgstr "小组 `Czech translators`"
+msgstr "小组 `捷克翻译`"
 
 #: ../../admin/access.rst:280 ../../admin/access.rst:393 ../../api.rst:565
 msgid "Roles"
@@ -546,7 +557,7 @@ msgstr "项目选择"
 
 #: ../../admin/access.rst:283
 msgid "`All public projects`"
-msgstr "`所有公开项目`"
+msgstr "`所有公共项目`"
 
 #: ../../admin/access.rst:287
 msgid "`Czech`"
@@ -554,14 +565,14 @@ msgstr "`捷克语`"
 
 #: ../../admin/access.rst:291
 msgid "Add users you wish to give the permissions to into this group."
-msgstr ""
+msgstr "将您希望授予此权限的用户添加到此组中。"
 
 #: ../../admin/access.rst:293
 msgid ""
 "As you can see, permissions management this way is powerful, but can be "
 "quite a tedious job. You can’t delegate it to another user, unless granting "
 "superuser permissions."
-msgstr ""
+msgstr "如您所见，这种方式的权限管理功能强大，但可能是一项相当乏味的工作。 您不能将其委托给其他用户，除非授予超级用户权限。"
 
 #: ../../admin/access.rst:300
 msgid "Users, roles, groups, and permissions"
@@ -569,7 +580,7 @@ msgstr "用户、角色、用户组和权限"
 
 #: ../../admin/access.rst:302
 msgid "The authentication models consist of several objects:"
-msgstr "身份验证模型包括几个对象："
+msgstr "身份验证模型由几个对象组成:"
 
 #: ../../admin/access.rst:305
 msgid "`Permission`"
@@ -579,25 +590,25 @@ msgstr "`权限`"
 msgid ""
 "Individual permission defined by Weblate. Permissions cannot be assigned to "
 "users. This can only be done through assignment of roles."
-msgstr "Weblate 定义的个人权限。权限不能分配给用户。这只能通过分配角色来完成。"
+msgstr "由Weblate定义的个人权限。 权限不能分配给用户。 这只能通过分配角色来完成。"
 
 #: ../../admin/access.rst:308
 msgid "`Role`"
-msgstr "`Role`"
+msgstr "`角色`"
 
 #: ../../admin/access.rst:308
 msgid ""
 "A role defines a set of permissions. This allows reuse of these sets in "
 "several places, making the administration easier."
-msgstr "角色定义为一组权限。这允许在几个地方重复使用这些组，使管理更容易。"
+msgstr "角色定义了一组权限。 这允许在多个地方重用这些集，使管理更加容易。"
 
 #: ../../admin/access.rst:310
 msgid "`User`"
-msgstr "`User`"
+msgstr "`user`"
 
 #: ../../admin/access.rst:311
 msgid "User can belong to several groups."
-msgstr "用户可归属于几个用户组。"
+msgstr "用户可以属于多个组。"
 
 #: ../../admin/access.rst:314
 msgid "`Group`"
@@ -607,13 +618,13 @@ msgstr "`群组`"
 msgid ""
 "Group connect roles, users, and authentication objects (projects, languages, "
 "and component lists)."
-msgstr "用户组连接角色、用户和身份验证对象（项目、语言和组件列表）。"
+msgstr "分组连接角色、用户和身份验证对象(项目、语言和组件列表)。"
 
 #: ../../admin/access.rst:331
 msgid ""
 "A group can have no roles assigned to it, in that case access to browse the "
 "project by anyone is assumed (see below)."
-msgstr ""
+msgstr "一个组可以不分配任何角色，但在这种情况下任何人都可以浏览它的项目（见下文）。"
 
 #: ../../admin/access.rst:335
 msgid "Access for browse to a project"
@@ -654,7 +665,7 @@ msgstr "群组范围"
 msgid ""
 "The scope of the permission assigned by the roles in the groups are applied "
 "by the following rules:"
-msgstr ""
+msgstr "组内角色分配的权限范围适用如下规则："
 
 #: ../../admin/access.rst:358
 msgid ""
@@ -707,7 +718,7 @@ msgstr ""
 
 #: ../../admin/access.rst:390
 msgid "Group `Spanish Admin-Reviewers`"
-msgstr ""
+msgstr "组名“西班牙审稿管理员”"
 
 #: ../../admin/access.rst:394
 msgid "`Review Strings`, `Manage repository`"
@@ -729,7 +740,7 @@ msgstr "`西班牙语`"
 msgid ""
 "Members of that group will have following permissions (assuming the default "
 "role settings):"
-msgstr ""
+msgstr "该组的成员将具有以下权限（假设是默认的角色设置）："
 
 #: ../../admin/access.rst:404
 msgid ""
@@ -785,7 +796,7 @@ msgid ""
 "As for now, there is no way to bulk-add already existing users to some group "
 "via the user interface. For that, you may resort to using the :ref:`REST API "
 "<api>`."
-msgstr ""
+msgstr "就目前而言，还没有办法通过用户界面将现有用户大量添加到某个组中。 但是，您可以用：ref: ' REST API < API > ' 来实现。"
 
 #: ../../admin/access.rst:440
 msgid "Default groups and roles"
@@ -795,7 +806,7 @@ msgstr "默认群组和角色"
 msgid ""
 "After installation, a default set of groups is created (see :ref:`default-"
 "groups`)."
-msgstr ""
+msgstr "安装完成后，将创建一组默认组（参见:ref: ' default-groups '）。"
 
 #: ../../admin/access.rst:444
 msgid ""
@@ -821,7 +832,7 @@ msgstr "查看账单信息[`Administration`, `Billing`]"
 
 #: ../../admin/access.rst:461 ../../api.rst:2014
 msgid "Changes"
-msgstr "修改"
+msgstr "变更"
 
 #: ../../admin/access.rst:461
 msgid "Download changes [`Administration`]"
@@ -857,21 +868,21 @@ msgstr "锁定组件，防止翻译 [`Administration`]"
 
 #: ../../admin/access.rst:474
 msgid "Add glossary entry [`Administration`, `Manage glossary`, `Power user`]"
-msgstr "添加词汇表入口[`Administration`, `Manage glossary`, `Power user`]"
+msgstr "添加语汇表入口[`Administration`, `Manage glossary`, `Power user`]"
 
 #: ../../admin/access.rst:476
 msgid "Edit glossary entry [`Administration`, `Manage glossary`, `Power user`]"
-msgstr "编辑词汇表入口[`Administration`, `Manage glossary`, `Power user`]"
+msgstr "编辑语汇表入口[`Administration`, `Manage glossary`, `Power user`]"
 
 #: ../../admin/access.rst:478
 msgid ""
 "Delete glossary entry [`Administration`, `Manage glossary`, `Power user`]"
-msgstr "删除词汇表入口[`Administration`, `Manage glossary`, `Power user`]"
+msgstr "删除语汇表入口[`Administration`, `Manage glossary`, `Power user`]"
 
 #: ../../admin/access.rst:480
 msgid ""
 "Upload glossary entries [`Administration`, `Manage glossary`, `Power user`]"
-msgstr "上传词汇表入口[`Administration`, `Manage glossary`, `Power user`]"
+msgstr "上传语汇表入口[`Administration`, `Manage glossary`, `Power user`]"
 
 #: ../../admin/access.rst:483 ../../user/translating.rst:306
 msgid "Automatic suggestions"
@@ -1204,6 +1215,7 @@ msgid ""
 "By default, :ref:`automatic group assignment <autogroup>` makes all new "
 "accounts members of this group when they join."
 msgstr ""
+"默认情况下，：ref: 'automatic group assignment<autogroup> ' 将会使所有新帐户在加入时成为该组的成员。"
 
 #: ../../admin/access.rst:614
 msgid "Default roles: none"
@@ -1272,7 +1284,7 @@ msgstr ""
 
 #: ../../admin/access.rst:652
 msgid "You can use built-in :ref:`invitations <manage-acl>` to add new users."
-msgstr ""
+msgstr "您可以使用内置的：ref: ' invitation <manage-acl> ' 来添加新用户。"
 
 #: ../../admin/addons.rst:4 ../../api.rst:2167
 msgid "Add-ons"
@@ -1292,6 +1304,8 @@ msgid ""
 "You can also configure add-ons using :ref:`API <addons-api>`, :setting:"
 "`DEFAULT_ADDONS`, or :djadmin:`install_addon`."
 msgstr ""
+"您也可以使用：ref: ' API <addons-api> '、setting: ' DEFAULT_ADDONS ' 或 djadmin: ' "
+"install_addon ' 来配置插件。"
 
 #: ../../admin/addons.rst:20
 msgid "Built-in add-ons"
@@ -1391,7 +1405,7 @@ msgstr "当组件中出现新字符串时。"
 msgid ""
 "Once in a month for every component, this can be configured using :setting:"
 "`BACKGROUND_TASKS`."
-msgstr ""
+msgstr "每个组件每个月一次，可以使用：setting: ' BACKGROUND_TASKS ' 进行配置。"
 
 #: ../../admin/addons.rst:54
 msgid ":ref:`auto-translation`, :ref:`translation-consistency`"
@@ -1820,7 +1834,7 @@ msgstr "**例子：**"
 
 #: ../../admin/addons.rst:234
 msgid "Label new strings automatically"
-msgstr ""
+msgstr "自动标记新字符串"
 
 #: ../../admin/addons.rst:237 ../../admin/addons.rst:245
 msgid "Search query"
@@ -1872,6 +1886,8 @@ msgid ""
 "You might also want to tighthen the :ref:`check-same` check by adding "
 "``strict-same`` flag to :ref:`component-check_flags`."
 msgstr ""
+"您可能还想通过在：ref: ' component-check_flags ' 中添加“strict-same ” 标志来加强：ref: ' check-"
+"same '检查。"
 
 #: ../../admin/addons.rst:279 ../../admin/addons.rst:295
 #: ../../admin/addons.rst:311
@@ -2024,7 +2040,7 @@ msgstr ""
 msgid ""
 "Finding strings whose localized counterparts might not fit the layout is "
 "also possible."
-msgstr ""
+msgstr "也可以查找其本地化对应项可能不适合布局的字符串。"
 
 #: ../../admin/addons.rst:379
 msgid ""
@@ -2047,7 +2063,7 @@ msgstr ""
 msgid ""
 "Uninstall the add-on once you have the new translation filled to prevent "
 "Weblate from changing the translations made after the copying."
-msgstr ""
+msgstr "一旦您有新的翻译填重，请卸载插件，以防止 Weblate 更改复制后的翻译。"
 
 #: ../../admin/addons.rst:397
 msgid "Contributors in comment"
@@ -2881,7 +2897,7 @@ msgstr "这就是语言全景页面上的样子："
 msgid ""
 "Image showing a message that reads: \"Czech translators rock!\" atop the "
 "Czech language overview."
-msgstr ""
+msgstr "在捷克语概览上的图片显示：“捷克翻译棒极了！”。"
 
 #: ../../admin/auth.rst:2
 msgid "Authentication"
@@ -3298,11 +3314,11 @@ msgstr "配置的例子："
 msgid ""
 "The default configuration extracts user details from following attributes, "
 "configure your IDP to provide them:"
-msgstr ""
+msgstr "默认配置从以下属性提取用户详细信息，通过配置您的IDP来配置它们："
 
 #: ../../admin/auth.rst:439
 msgid "Attribute"
-msgstr ""
+msgstr "属性"
 
 #: ../../admin/auth.rst:439
 msgid "SAML URI reference"
@@ -3314,7 +3330,7 @@ msgstr "全名"
 
 #: ../../admin/auth.rst:441
 msgid "``urn:oid:2.5.4.3``"
-msgstr ""
+msgstr "“urn:oid:2.5.4.3”"
 
 #: ../../admin/auth.rst:443
 msgid "First name"
@@ -3322,7 +3338,7 @@ msgstr "名字"
 
 #: ../../admin/auth.rst:443
 msgid "``urn:oid:2.5.4.42``"
-msgstr ""
+msgstr "“urn:oid:2.5.4.42”"
 
 #: ../../admin/auth.rst:445
 msgid "Last name"
@@ -3330,7 +3346,7 @@ msgstr "姓氏"
 
 #: ../../admin/auth.rst:445
 msgid "``urn:oid:2.5.4.4``"
-msgstr ""
+msgstr "“urn:oid:2.5.4.4”"
 
 #: ../../admin/auth.rst:447
 msgid "E-mail"
@@ -3338,7 +3354,7 @@ msgstr "电子邮箱"
 
 #: ../../admin/auth.rst:447
 msgid "``urn:oid:0.9.2342.19200300.100.1.3``"
-msgstr ""
+msgstr "“urn:oid:0.9.2342.19200300.100.1.3”"
 
 #: ../../admin/auth.rst:449 ../../api.rst:237
 msgid "Username"
@@ -3346,13 +3362,15 @@ msgstr "用户名"
 
 #: ../../admin/auth.rst:449
 msgid "``urn:oid:0.9.2342.19200300.100.1.1``"
-msgstr ""
+msgstr "“urn:oid:0.9.2342.19200300.100.1.1”"
 
 #: ../../admin/auth.rst:454
 msgid ""
 "The example above and the Docker image define an IDP labelled ``weblate``. "
 "You might need to configure this string as :guilabel:`Relay` in your IDP."
 msgstr ""
+"上面的例子和 Docker 图像定义了一个 IDP 并且标记为 “weblate”。 您可能需要在 IDP 中将此字符串配置为：guilabel: ' "
+"Relay '。"
 
 #: ../../admin/auth.rst:459
 msgid ""
@@ -3554,11 +3572,11 @@ msgstr "每天备份之前 14 天的内容"
 
 #: ../../admin/backup.rst:23
 msgid "Weekly backups for 8 weeks back"
-msgstr ""
+msgstr "8周前每周备份"
 
 #: ../../admin/backup.rst:24
 msgid "Monthly backups for 6 months back"
-msgstr ""
+msgstr "6个月前的每月备份"
 
 #: ../../admin/backup.rst:31
 msgid "Borg encryption key"
@@ -3706,16 +3724,17 @@ msgid ""
 "another server that’s accessible for your Weblate deployment via SSH using "
 "the Weblate SSH key:"
 msgstr ""
+"您必须安装“BorgBackup”到另一个服务器上（_o）才能创建远程备份，可以使用Weblate SSH密钥通过SSH访问您的Weblate部署："
 
 #: ../../admin/backup.rst:116
 msgid "Prepare a server where your backups will be stored."
-msgstr ""
+msgstr "准备一个用于存储备份的服务器。"
 
 #: ../../admin/backup.rst:117
 msgid ""
 "Install the SSH server on it (you will get it by default with most Linux "
 "distributions)."
-msgstr ""
+msgstr "在上面安装SSH服务器（大多数Linux发行版默认情况下都会安装SSH服务器）。"
 
 #: ../../admin/backup.rst:118
 msgid ""
@@ -3727,18 +3746,19 @@ msgstr ""
 msgid ""
 "Choose an existing user or create a new user that will be used for backing "
 "up."
-msgstr ""
+msgstr "选择一个现有用户或创建一个用于备份的新用户。"
 
 #: ../../admin/backup.rst:120
 msgid ""
 "Add Weblate SSH key to the user so that Weblate can SSH to the server "
 "without a password (see :ref:`weblate-ssh-key`)."
 msgstr ""
+"为用户添加Weblate SSH密钥，使Weblate可以在不需要密码的情况下SSH到服务器（参见：如： “Weblate - SSH -key ”）。"
 
 #: ../../admin/backup.rst:121
 msgid ""
 "Configure the backup location in Weblate as ``user@host:/path/to/backups``."
-msgstr ""
+msgstr "在Weblate中配置备份位置为“user@host:/path/to/backups”。"
 
 #: ../../admin/backup.rst:125
 msgid ""
@@ -3932,7 +3952,7 @@ msgstr "下载的数据用于备份"
 msgid ""
 "The environment dump was added as :file:`environment.yml` to help in "
 "restoring in the Docker environments."
-msgstr ""
+msgstr "环境变量被转储在： ' environment. yml ' 文件末尾，以便帮助恢复在Docker环境。"
 
 #: ../../admin/backup.rst:252
 msgid "Stored in :setting:`DATA_DIR` ``/backups``."
@@ -3961,7 +3981,7 @@ msgstr "PostgreSQL 数据库备份为 :file:`database.sql` 。"
 
 #: ../../admin/backup.rst:260
 msgid "Environment dump as :file:`environment.yml`."
-msgstr ""
+msgstr "环境变量转储在： file:' environment. yml '。"
 
 #: ../../admin/backup.rst:262
 msgid ""
@@ -3973,7 +3993,7 @@ msgstr ""
 
 #: ../../admin/backup.rst:265
 msgid "To restore the database backup load it using dabase tools, for example:"
-msgstr ""
+msgstr "要恢复数据库备份，请使用数据库工具加载它，例如:"
 
 #: ../../admin/backup.rst:272
 msgid "Version control repositories"
@@ -4331,7 +4351,7 @@ msgstr "``forbidden``"
 #: ../../admin/checks.rst:83
 msgid ""
 "Indicates forbidden translation in a glossary, see :ref:`glossary-forbidden`."
-msgstr ""
+msgstr "表示术语表中的禁止翻译，参见:ref: ' glossary-forbidden '。"
 
 #: ../../admin/checks.rst:89
 msgid ""
@@ -4382,7 +4402,7 @@ msgstr "``check-glossary``"
 
 #: ../../admin/checks.rst:94
 msgid "Enable the \"Does not follow glossary\" quality check."
-msgstr "启用“未遵循词汇表”质量检查。"
+msgstr "启用“未遵循语汇表”质量检查。"
 
 #: ../../admin/checks.rst:95
 msgid "``ignore-bbcode``"
@@ -4406,7 +4426,7 @@ msgstr "``ignore-check-glossary``"
 
 #: ../../admin/checks.rst:100
 msgid "Skip the \"Does not follow glossary\" quality check."
-msgstr "跳过“未遵循词汇表”质量检查。"
+msgstr "跳过“未遵循语汇表”质量检查。"
 
 #: ../../admin/checks.rst:101
 msgid "``ignore-double-space``"
@@ -5424,7 +5444,7 @@ msgstr ""
 
 #: ../../admin/config.rst:201
 msgid "Right now this controls:"
-msgstr ""
+msgstr "现在这个控件:"
 
 #: ../../admin/config.rst:203
 msgid ":ref:`addon-weblate.autotranslate.autotranslate` addon"
@@ -5633,7 +5653,7 @@ msgstr ""
 msgid ""
 "The sender is used in as :mailheader:`Reply-To`, this is the default "
 "behaviour."
-msgstr ""
+msgstr "发送者在：mailheader: ' Reply-To '中使用，这是默认行为。"
 
 #: ../../admin/config.rst:371
 msgid "``\"from\"``"
@@ -5740,7 +5760,7 @@ msgstr ":file:`fonts`:"
 
 #: ../../admin/config.rst:400
 msgid "User-uploaded  fonts, see :ref:`fonts`."
-msgstr ""
+msgstr "用户上传的字体，参见：ref: ' fonts '。"
 
 #: ../../admin/config.rst:404
 msgid ""
@@ -6667,7 +6687,7 @@ msgstr ""
 
 #: ../../admin/config.rst:1268
 msgid "``https://api.deepl.com/v2/`` (default in Weblate)"
-msgstr ""
+msgstr "“ https://api.deepl.com/v2/”（Weblate 默认）"
 
 #: ../../admin/config.rst:1269
 msgid ""
@@ -6676,7 +6696,7 @@ msgstr "用于付费计划的 API 用量，订阅是基于用量的。"
 
 #: ../../admin/config.rst:1270
 msgid "``https://api-free.deepl.com/v2/``"
-msgstr ""
+msgstr "”https://api-free.deepl.com/v2/“"
 
 #: ../../admin/config.rst:1271
 msgid ""
@@ -6685,7 +6705,7 @@ msgstr "用于免费计划的 API 用量，订阅是基于用量的。"
 
 #: ../../admin/config.rst:1273
 msgid "``https://api.deepl.com/v1/``"
-msgstr ""
+msgstr "”https://api.deepl.com/v1/“"
 
 #: ../../admin/config.rst:1273
 msgid "Is meant for CAT tools and is usable with a per-user subscription."
@@ -6706,7 +6726,7 @@ msgstr ""
 msgid ""
 "The easiest way to find out which one to use is to open an URL like the "
 "following in your browser:"
-msgstr ""
+msgstr "最简单的方法就是在浏览器中打开如下网址："
 
 #: ../../admin/config.rst:1283
 msgid ""
@@ -7670,7 +7690,7 @@ msgstr "WEBLATE_EXPORTERS"
 msgid ""
 "List of a available exporters offering downloading translations or "
 "glossaries in various file formats."
-msgstr "可用的导出程序列表，提供下载各种文件格式的翻译或词汇表。"
+msgstr "可用的导出程序列表，提供下载各种文件格式的翻译或语汇表。"
 
 #: ../../admin/config.rst:2103 ../../admin/config.rst:2120
 #: ../../user/files.rst:74
@@ -11236,7 +11256,7 @@ msgstr ""
 
 #: ../../admin/install/docker.rst:251
 msgid "Scaling horizontally"
-msgstr ""
+msgstr "横向扩展"
 
 #: ../../admin/install/docker.rst:257
 msgid "This feature is a technology preview."
@@ -15607,7 +15627,7 @@ msgstr "30"
 
 #: ../../admin/optionals.rst:273
 msgid "Adding to glossary"
-msgstr "添加到词汇表"
+msgstr "添加到语汇表"
 
 #: ../../admin/optionals.rst:273
 msgid "``GLOSSARY``"
@@ -20674,7 +20694,7 @@ msgstr "增加了阻止用户参与项目的功能。"
 
 #: ../../changes.rst:16
 msgid "Fixed automatic creation of glossary languages."
-msgstr "修复了词汇表语言的自动创建。"
+msgstr "修复了语汇表语言的自动创建。"
 
 #: ../../changes.rst:17
 msgid "Extended documentation about add-ons."
@@ -20734,7 +20754,7 @@ msgstr "改进了度量性能。"
 
 #: ../../changes.rst:35
 msgid "Fixed possible bug in saving glossaries."
-msgstr "修复了保存词汇表可能发生的错误。"
+msgstr "修复了保存语汇表可能发生的错误。"
 
 #: ../../changes.rst:36
 msgid ""
@@ -21007,7 +21027,7 @@ msgstr "改进了 Markdown 链接检查。"
 
 #: ../../changes.rst:123
 msgid "Indicate glossary and source language in breadcrumbs."
-msgstr "在面包屑导航中指示词汇表和源语言。"
+msgstr "在面包屑导航中指示语汇表和源语言。"
 
 #: ../../changes.rst:124
 msgid "Paginated component listing of huge projects."
@@ -21136,7 +21156,7 @@ msgstr "添加了自动关注用户贡献的项目的选项。"
 
 #: ../../changes.rst:159
 msgid "Added check whether translation matches the glossary."
-msgstr "添加了检查翻译是否与词汇表匹配的功能。"
+msgstr "添加了检查翻译是否与语汇表匹配的功能。"
 
 #: ../../changes.rst:160
 msgid "Added support for customizing navigation text color."
@@ -21477,7 +21497,7 @@ msgstr "修复了分页的页面上订购的组件。"
 
 #: ../../changes.rst:266
 msgid "Define source language for a glossary."
-msgstr "为词汇表确定了语言。"
+msgstr "为语汇表确定了语言。"
 
 #: ../../changes.rst:267
 msgid "Rewritten support for GitHub and GitLab pull requests."
@@ -21527,7 +21547,7 @@ msgstr "增加了与多个GitLab或GitHub实例交互的支持。"
 msgid ""
 "Extended API to cover project updates, unit updates and removals and "
 "glossaries."
-msgstr "扩展了 API 以覆盖项目更新、单元更新与删除，以及词汇表。"
+msgstr "扩展了 API 以覆盖项目更新、单元更新与删除，以及语汇表。"
 
 #: ../../changes.rst:279
 msgid "Unit API now properly handles plural strings."
@@ -21784,7 +21804,7 @@ msgstr "改进了字节编译的区域设置文件的安装。"
 
 #: ../../changes.rst:357
 msgid "Fixed adding words to glossary."
-msgstr "修复了向词汇表添加单词。"
+msgstr "修复了向语汇表添加单词。"
 
 #: ../../changes.rst:358
 msgid "Fixed keyboard shortcuts for machinery."
@@ -21857,7 +21877,7 @@ msgstr "允许注册关闭时的白名单注册方法。"
 
 #: ../../changes.rst:379
 msgid "Improved lookup of related terms in glossary."
-msgstr "改进了词汇表中相关术语的查找。"
+msgstr "改进了语汇表中相关术语的查找。"
 
 #: ../../changes.rst:380
 msgid "Improved translation memory matches."
@@ -21979,7 +21999,7 @@ msgstr "API 现在支持对更改的筛选。"
 
 #: ../../changes.rst:406
 msgid "Added support for sharing glossaries between projects."
-msgstr "为项目之间分享词汇表添加了支持。"
+msgstr "为项目之间分享语汇表添加了支持。"
 
 #: ../../changes.rst:409
 msgid "Weblate 4.0.4"
@@ -22373,7 +22393,7 @@ msgstr "修复了手动推送到上游仓库。"
 
 #: ../../changes.rst:539
 msgid "Improved glossary matching."
-msgstr "改进了词汇表匹配。"
+msgstr "改进了语汇表匹配。"
 
 #: ../../changes.rst:542
 msgid "Weblate 3.11"
@@ -23959,7 +23979,7 @@ msgstr "添加了选项在 Weblate 中禁止访问管理，有利于 Django。"
 
 #: ../../changes.rst:1042
 msgid "Improved glossary lookup speed for large strings."
-msgstr "改进了大字符串的词汇表查询速度。"
+msgstr "改进了大字符串的语汇表查询速度。"
 
 #: ../../changes.rst:1043
 msgid "Compatibility with django_auth_ldap 1.3.0."
@@ -24204,7 +24224,7 @@ msgstr "改进了认证失败的错误消息。"
 
 #: ../../changes.rst:1125
 msgid "Keep page state when removing word from glossary."
-msgstr "当从词汇表删除单词时保持页面状态。"
+msgstr "当从语汇表删除单词时保持页面状态。"
 
 #: ../../changes.rst:1126
 msgid "Added direct link to edit secondary language translation."
@@ -24260,7 +24280,7 @@ msgstr "发布于 2017 年 05 月 17 日。"
 
 #: ../../changes.rst:1147
 msgid "Add glossary entries using AJAX."
-msgstr "使用 AJAX 添加词汇表条目。"
+msgstr "使用 AJAX 添加语汇表条目。"
 
 #: ../../changes.rst:1148
 msgid "The logout now uses POST to avoid CSRF."
@@ -25609,7 +25629,7 @@ msgstr "更好地命名复数形式。"
 
 #: ../../changes.rst:1575
 msgid "Added support for TBX export of glossary."
-msgstr "为词汇表的 TBX 导出添加了支持。"
+msgstr "为语汇表的 TBX 导出添加了支持。"
 
 #: ../../changes.rst:1576
 msgid "Added support for Bitbucket notifications."
@@ -33191,11 +33211,11 @@ msgstr ""
 
 #: ../../user/checks.rst:82
 msgid "Does not follow glossary"
-msgstr "不遵循词汇表"
+msgstr "不遵循语汇表"
 
 #: ../../user/checks.rst:86
 msgid "*The translation does not follow terms defined in a glossary.*"
-msgstr "*该翻译未遵循词汇表中定义的术语。*"
+msgstr "*该翻译未遵循语汇表中定义的术语。*"
 
 #: ../../user/checks.rst:88
 msgid ""
@@ -34859,9 +34879,7 @@ msgstr ""
 msgid ""
 "Use any component as a glossary by turning on :ref:`component-is_glossary`. "
 "You can create multiple glossaries for one project."
-msgstr ""
-"使用任何组件作为词汇表，方法是开启 :ref:`component-is_glossary`。你可以为一个"
-"项目创建多个词汇表。"
+msgstr "使用任何组件作为语汇表，方法是开启 :ref:`component-is_glossary`。你可以为一个项目创建多个语汇表。"
 
 #: ../../user/glossary.rst:27
 msgid ""
@@ -34887,7 +34905,7 @@ msgstr "或将它们作为任意翻译进行编辑。"
 
 #: ../../user/glossary.rst:44
 msgid "Glossary terms"
-msgstr "词汇表术语"
+msgstr "语汇表术语"
 
 #: ../../user/glossary.rst:46
 msgid ""
@@ -36117,7 +36135,7 @@ msgstr "查找过去曾经翻译的相识字符串，参见:ref:`memory`。"
 
 #: ../../user/translating.rst:271
 msgid "Displays terms from the project glossary used in the current message."
-msgstr "显示当前信息中使用的项目词汇表的术语。"
+msgstr "显示当前信息中使用的项目语汇表的术语。"
 
 #: ../../user/translating.rst:272
 msgid "Recent changes"

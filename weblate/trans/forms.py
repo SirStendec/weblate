@@ -63,6 +63,7 @@ from weblate.utils.errors import report_error
 from weblate.utils.forms import (
     ColorWidget,
     ContextDiv,
+    EmailField,
     SearchField,
     SortedSelect,
     SortedSelectMultiple,
@@ -158,9 +159,9 @@ class UserField(forms.CharField):
         try:
             return User.objects.get(Q(username=value) | Q(email=value))
         except User.DoesNotExist:
-            raise ValidationError(_("No matching user found."))
+            raise ValidationError(_("Could not find any such user."))
         except User.MultipleObjectsReturned:
-            raise ValidationError(_("More users matched."))
+            raise ValidationError(_("More possible users were found."))
 
 
 class QueryField(forms.CharField):
@@ -181,7 +182,7 @@ class QueryField(forms.CharField):
             return value
         except Exception as error:
             report_error()
-            raise ValidationError(_("Failed to parse query string: {}").format(error))
+            raise ValidationError(_("Could not parse query string: {}").format(error))
 
 
 class FlagField(forms.CharField):
@@ -189,7 +190,7 @@ class FlagField(forms.CharField):
 
 
 class PluralTextarea(forms.Textarea):
-    """Text area extension which possibly handles plurals."""
+    """Text-area extension which possibly handles plurals."""
 
     def __init__(self, *args, **kwargs):
         self.profile = None
@@ -643,7 +644,7 @@ class ExtraUploadForm(UploadForm):
     """Advanced upload form for users who can override authorship."""
 
     author_name = forms.CharField(label=_("Author name"))
-    author_email = forms.EmailField(label=_("Author e-mail"))
+    author_email = EmailField(label=_("Author e-mail"))
 
 
 def get_upload_form(user, translation, *args, **kwargs):
@@ -1796,6 +1797,7 @@ class ProjectSettingsForm(SettingsBaseForm, ProjectDocsMixin, ProjectAntispamMix
         widgets = {
             "access_control": forms.RadioSelect,
             "instructions": MarkdownTextarea,
+            "language_aliases": forms.TextInput,
         }
 
     def clean(self):

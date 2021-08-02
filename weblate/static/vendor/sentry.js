@@ -1,4 +1,4 @@
-/*! @sentry/browser 6.7.2 (35498a6) | https://github.com/getsentry/sentry-javascript */
+/*! @sentry/browser 6.10.0 (1713dd9) | https://github.com/getsentry/sentry-javascript */
 var Sentry = (function (exports) {
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -370,7 +370,7 @@ var Sentry = (function (exports) {
      * e.g. [HTMLElement] => body > div > input#foo.btn[name=baz]
      * @returns generated DOM path
      */
-    function htmlTreeAsString(elem, keyAttr) {
+    function htmlTreeAsString(elem, keyAttrs) {
         // try/catch both:
         // - accessing event.target (see getsentry/raven-js#838, #768)
         // - `htmlTreeAsString` because it's complex, and just accessing the DOM incorrectly
@@ -387,7 +387,7 @@ var Sentry = (function (exports) {
             var nextStr = void 0;
             // eslint-disable-next-line no-plusplus
             while (currentElem && height++ < MAX_TRAVERSE_HEIGHT) {
-                nextStr = _htmlElementAsString(currentElem, keyAttr);
+                nextStr = _htmlElementAsString(currentElem, keyAttrs);
                 // bail out if
                 // - nextStr is the 'html' element
                 // - the length of the string that would be created exceeds MAX_OUTPUT_LEN
@@ -410,7 +410,8 @@ var Sentry = (function (exports) {
      * e.g. [HTMLElement] => input#foo.btn[name=baz]
      * @returns generated DOM path
      */
-    function _htmlElementAsString(el, keyAttr) {
+    function _htmlElementAsString(el, keyAttrs) {
+        var _a, _b;
         var elem = el;
         var out = [];
         var className;
@@ -422,9 +423,13 @@ var Sentry = (function (exports) {
             return '';
         }
         out.push(elem.tagName.toLowerCase());
-        var keyAttrValue = keyAttr ? elem.getAttribute(keyAttr) : null;
-        if (keyAttrValue) {
-            out.push("[" + keyAttr + "=\"" + keyAttrValue + "\"]");
+        // Pairs of attribute keys defined in `serializeAttribute` and their values on element.
+        var keyAttrPairs = ((_a = keyAttrs) === null || _a === void 0 ? void 0 : _a.length) ? keyAttrs.filter(function (keyAttr) { return elem.getAttribute(keyAttr); }).map(function (keyAttr) { return [keyAttr, elem.getAttribute(keyAttr)]; })
+            : null;
+        if ((_b = keyAttrPairs) === null || _b === void 0 ? void 0 : _b.length) {
+            keyAttrPairs.forEach(function (keyAttrPair) {
+                out.push("[" + keyAttrPair[0] + "=\"" + keyAttrPair[1] + "\"]");
+            });
         }
         else {
             if (elem.id) {
@@ -2154,31 +2159,39 @@ var Sentry = (function (exports) {
             return this._limit === undefined || this.length() < this._limit;
         };
         /**
-         * Add a promise to the queue.
+         * Add a promise (representing an in-flight action) to the queue, and set it to remove itself on fulfillment.
          *
-         * @param task Can be any PromiseLike<T>
+         * @param taskProducer A function producing any PromiseLike<T>; In previous versions this used to be `task:
+         *        PromiseLike<T>`, but under that model, Promises were instantly created on the call-site and their executor
+         *        functions therefore ran immediately. Thus, even if the buffer was full, the action still happened. By
+         *        requiring the promise to be wrapped in a function, we can defer promise creation until after the buffer
+         *        limit check.
          * @returns The original promise.
          */
-        PromiseBuffer.prototype.add = function (task) {
+        PromiseBuffer.prototype.add = function (taskProducer) {
             var _this = this;
             if (!this.isReady()) {
                 return SyncPromise.reject(new SentryError('Not adding Promise due to buffer limit reached.'));
             }
+            // start the task and add its promise to the queue
+            var task = taskProducer();
             if (this._buffer.indexOf(task) === -1) {
                 this._buffer.push(task);
             }
             void task
                 .then(function () { return _this.remove(task); })
+                // Use `then(null, rejectionHandler)` rather than `catch(rejectionHandler)` so that we can use `PromiseLike`
+                // rather than `Promise`. `PromiseLike` doesn't have a `.catch` method, making its polyfill smaller. (ES5 didn't
+                // have promises, so TS has to polyfill when down-compiling.)
                 .then(null, function () {
                 return _this.remove(task).then(null, function () {
-                    // We have to add this catch here otherwise we have an unhandledPromiseRejection
-                    // because it's a new Promise chain.
+                    // We have to add another catch here because `this.remove()` starts a new promise chain.
                 });
             });
             return task;
         };
         /**
-         * Remove a promise to the queue.
+         * Remove a promise from the queue.
          *
          * @param task Can be any PromiseLike<T>
          * @returns Removed promise.
@@ -2194,19 +2207,24 @@ var Sentry = (function (exports) {
             return this._buffer.length;
         };
         /**
-         * This will drain the whole queue, returns true if queue is empty or drained.
-         * If timeout is provided and the queue takes longer to drain, the promise still resolves but with false.
+         * Wait for all promises in the queue to resolve or for timeout to expire, whichever comes first.
          *
-         * @param timeout Number in ms to wait until it resolves with false.
+         * @param timeout The time, in ms, after which to resolve to `false` if the queue is still non-empty. Passing `0` (or
+         * not passing anything) will make the promise wait as long as it takes for the queue to drain before resolving to
+         * `true`.
+         * @returns A promise which will resolve to `true` if the queue is already empty or drains before the timeout, and
+         * `false` otherwise
          */
         PromiseBuffer.prototype.drain = function (timeout) {
             var _this = this;
             return new SyncPromise(function (resolve) {
+                // wait for `timeout` ms and then resolve to `false` (if not cancelled first)
                 var capturedSetTimeout = setTimeout(function () {
                     if (timeout && timeout > 0) {
                         resolve(false);
                     }
                 }, timeout);
+                // if all promises resolve in time, cancel the timer and resolve to `true`
                 void SyncPromise.all(_this._buffer)
                     .then(function () {
                     clearTimeout(capturedSetTimeout);
@@ -3804,8 +3822,8 @@ var Sentry = (function (exports) {
         function BaseClient(backendClass, options) {
             /** Array of used integrations. */
             this._integrations = {};
-            /** Number of call being processed */
-            this._processing = 0;
+            /** Number of calls being processed */
+            this._numProcessing = 0;
             this._backend = new backendClass(options);
             this._options = options;
             if (options.dsn) {
@@ -3887,11 +3905,11 @@ var Sentry = (function (exports) {
          */
         BaseClient.prototype.flush = function (timeout) {
             var _this = this;
-            return this._isClientProcessing(timeout).then(function (ready) {
+            return this._isClientDoneProcessing(timeout).then(function (clientFinished) {
                 return _this._getBackend()
                     .getTransport()
                     .close(timeout)
-                    .then(function (transportFlushed) { return ready && transportFlushed; });
+                    .then(function (transportFlushed) { return clientFinished && transportFlushed; });
             });
         };
         /**
@@ -3964,14 +3982,23 @@ var Sentry = (function (exports) {
         BaseClient.prototype._sendSession = function (session) {
             this._getBackend().sendSession(session);
         };
-        /** Waits for the client to be done with processing. */
-        BaseClient.prototype._isClientProcessing = function (timeout) {
+        /**
+         * Determine if the client is finished processing. Returns a promise because it will wait `timeout` ms before saying
+         * "no" (resolving to `false`) in order to give the client a chance to potentially finish first.
+         *
+         * @param timeout The time, in ms, after which to resolve to `false` if the client is still busy. Passing `0` (or not
+         * passing anything) will make the promise wait as long as it takes for processing to finish before resolving to
+         * `true`.
+         * @returns A promise which will resolve to `true` if processing is already done or finishes before the timeout, and
+         * `false` otherwise
+         */
+        BaseClient.prototype._isClientDoneProcessing = function (timeout) {
             var _this = this;
             return new SyncPromise(function (resolve) {
                 var ticked = 0;
                 var tick = 1;
                 var interval = setInterval(function () {
-                    if (_this._processing == 0) {
+                    if (_this._numProcessing == 0) {
                         clearInterval(interval);
                         resolve(true);
                     }
@@ -4069,6 +4096,10 @@ var Sentry = (function (exports) {
             if (event.contexts && event.contexts.trace) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 normalized.contexts.trace = event.contexts.trace;
+            }
+            var _a = this.getOptions()._experiments, _experiments = _a === void 0 ? {} : _a;
+            if (_experiments.ensureNoCircularStructures) {
+                return normalize(normalized);
             }
             return normalized;
         };
@@ -4202,12 +4233,12 @@ var Sentry = (function (exports) {
          */
         BaseClient.prototype._process = function (promise) {
             var _this = this;
-            this._processing += 1;
+            this._numProcessing += 1;
             void promise.then(function (value) {
-                _this._processing -= 1;
+                _this._numProcessing -= 1;
                 return value;
             }, function (reason) {
-                _this._processing -= 1;
+                _this._numProcessing -= 1;
                 return reason;
             });
         };
@@ -4414,7 +4445,7 @@ var Sentry = (function (exports) {
         hub.bindClient(client);
     }
 
-    var SDK_VERSION = '6.7.2';
+    var SDK_VERSION = '6.10.0';
 
     var originalFunctionToString;
     /** Patch toString calls to return proper name for wrapped functions */
@@ -5278,23 +5309,25 @@ var Sentry = (function (exports) {
             if (this.options.headers !== undefined) {
                 options.headers = this.options.headers;
             }
-            return this._buffer.add(new SyncPromise(function (resolve, reject) {
-                void _this._fetch(sentryRequest.url, options)
-                    .then(function (response) {
-                    var headers = {
-                        'x-sentry-rate-limits': response.headers.get('X-Sentry-Rate-Limits'),
-                        'retry-after': response.headers.get('Retry-After'),
-                    };
-                    _this._handleResponse({
-                        requestType: sentryRequest.type,
-                        response: response,
-                        headers: headers,
-                        resolve: resolve,
-                        reject: reject,
-                    });
-                })
-                    .catch(reject);
-            }));
+            return this._buffer.add(function () {
+                return new SyncPromise(function (resolve, reject) {
+                    void _this._fetch(sentryRequest.url, options)
+                        .then(function (response) {
+                        var headers = {
+                            'x-sentry-rate-limits': response.headers.get('X-Sentry-Rate-Limits'),
+                            'retry-after': response.headers.get('Retry-After'),
+                        };
+                        _this._handleResponse({
+                            requestType: sentryRequest.type,
+                            response: response,
+                            headers: headers,
+                            resolve: resolve,
+                            reject: reject,
+                        });
+                    })
+                        .catch(reject);
+                });
+            });
         };
         return FetchTransport;
     }(BaseTransport));
@@ -5331,25 +5364,27 @@ var Sentry = (function (exports) {
                     status: 429,
                 });
             }
-            return this._buffer.add(new SyncPromise(function (resolve, reject) {
-                var request = new XMLHttpRequest();
-                request.onreadystatechange = function () {
-                    if (request.readyState === 4) {
-                        var headers = {
-                            'x-sentry-rate-limits': request.getResponseHeader('X-Sentry-Rate-Limits'),
-                            'retry-after': request.getResponseHeader('Retry-After'),
-                        };
-                        _this._handleResponse({ requestType: sentryRequest.type, response: request, headers: headers, resolve: resolve, reject: reject });
+            return this._buffer.add(function () {
+                return new SyncPromise(function (resolve, reject) {
+                    var request = new XMLHttpRequest();
+                    request.onreadystatechange = function () {
+                        if (request.readyState === 4) {
+                            var headers = {
+                                'x-sentry-rate-limits': request.getResponseHeader('X-Sentry-Rate-Limits'),
+                                'retry-after': request.getResponseHeader('Retry-After'),
+                            };
+                            _this._handleResponse({ requestType: sentryRequest.type, response: request, headers: headers, resolve: resolve, reject: reject });
+                        }
+                    };
+                    request.open('POST', sentryRequest.url);
+                    for (var header in _this.options.headers) {
+                        if (_this.options.headers.hasOwnProperty(header)) {
+                            request.setRequestHeader(header, _this.options.headers[header]);
+                        }
                     }
-                };
-                request.open('POST', sentryRequest.url);
-                for (var header in _this.options.headers) {
-                    if (_this.options.headers.hasOwnProperty(header)) {
-                        request.setRequestHeader(header, _this.options.headers[header]);
-                    }
-                }
-                request.send(sentryRequest.body);
-            }));
+                    request.send(sentryRequest.body);
+                });
+            });
         };
         return XHRTransport;
     }(BaseTransport));
@@ -5605,9 +5640,9 @@ var Sentry = (function (exports) {
                         return;
                     }
                     var client = currentHub.getClient();
-                    var event = isPrimitive(error)
+                    var event = error === undefined && isString(data.msg)
                         ? _this._eventFromIncompleteOnError(data.msg, data.url, data.line, data.column)
-                        : _this._enhanceEventWithInitialFrame(eventFromUnknownInput(error, undefined, {
+                        : _this._enhanceEventWithInitialFrame(eventFromUnknownInput(error || data.msg, undefined, {
                             attachStacktrace: client && client.getOptions().attachStacktrace,
                             rejection: false,
                         }), data.url, data.line, data.column);
@@ -5688,12 +5723,10 @@ var Sentry = (function (exports) {
             // If 'message' is ErrorEvent, get real message from inside
             var message = isErrorEvent(msg) ? msg.message : msg;
             var name;
-            if (isString(message)) {
-                var groups = message.match(ERROR_TYPES_RE);
-                if (groups) {
-                    name = groups[1];
-                    message = groups[2];
-                }
+            var groups = message.match(ERROR_TYPES_RE);
+            if (groups) {
+                name = groups[1];
+                message = groups[2];
             }
             var event = {
                 exception: {
@@ -6118,12 +6151,15 @@ var Sentry = (function (exports) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         Breadcrumbs.prototype._domBreadcrumb = function (handlerData) {
             var target;
-            var keyAttr = typeof this._options.dom === 'object' ? this._options.dom.serializeAttribute : undefined;
+            var keyAttrs = typeof this._options.dom === 'object' ? this._options.dom.serializeAttribute : undefined;
+            if (typeof keyAttrs === 'string') {
+                keyAttrs = [keyAttrs];
+            }
             // Accessing event.target can throw (see getsentry/raven-js#838, #768)
             try {
                 target = handlerData.event.target
-                    ? htmlTreeAsString(handlerData.event.target, keyAttr)
-                    : htmlTreeAsString(handlerData.event, keyAttr);
+                    ? htmlTreeAsString(handlerData.event.target, keyAttrs)
+                    : htmlTreeAsString(handlerData.event, keyAttrs);
             }
             catch (e) {
                 target = '<unknown>';
@@ -6335,6 +6371,170 @@ var Sentry = (function (exports) {
         return UserAgent;
     }());
 
+    /** Deduplication filter */
+    var Dedupe = /** @class */ (function () {
+        function Dedupe() {
+            /**
+             * @inheritDoc
+             */
+            this.name = Dedupe.id;
+        }
+        /**
+         * @inheritDoc
+         */
+        Dedupe.prototype.setupOnce = function (addGlobalEventProcessor, getCurrentHub) {
+            addGlobalEventProcessor(function (currentEvent) {
+                var self = getCurrentHub().getIntegration(Dedupe);
+                if (self) {
+                    // Juuust in case something goes wrong
+                    try {
+                        if (self._shouldDropEvent(currentEvent, self._previousEvent)) {
+                            return null;
+                        }
+                    }
+                    catch (_oO) {
+                        return (self._previousEvent = currentEvent);
+                    }
+                    return (self._previousEvent = currentEvent);
+                }
+                return currentEvent;
+            });
+        };
+        /** JSDoc */
+        Dedupe.prototype._shouldDropEvent = function (currentEvent, previousEvent) {
+            if (!previousEvent) {
+                return false;
+            }
+            if (this._isSameMessageEvent(currentEvent, previousEvent)) {
+                return true;
+            }
+            if (this._isSameExceptionEvent(currentEvent, previousEvent)) {
+                return true;
+            }
+            return false;
+        };
+        /** JSDoc */
+        Dedupe.prototype._isSameMessageEvent = function (currentEvent, previousEvent) {
+            var currentMessage = currentEvent.message;
+            var previousMessage = previousEvent.message;
+            // If neither event has a message property, they were both exceptions, so bail out
+            if (!currentMessage && !previousMessage) {
+                return false;
+            }
+            // If only one event has a stacktrace, but not the other one, they are not the same
+            if ((currentMessage && !previousMessage) || (!currentMessage && previousMessage)) {
+                return false;
+            }
+            if (currentMessage !== previousMessage) {
+                return false;
+            }
+            if (!this._isSameFingerprint(currentEvent, previousEvent)) {
+                return false;
+            }
+            if (!this._isSameStacktrace(currentEvent, previousEvent)) {
+                return false;
+            }
+            return true;
+        };
+        /** JSDoc */
+        Dedupe.prototype._getFramesFromEvent = function (event) {
+            var exception = event.exception;
+            if (exception) {
+                try {
+                    // @ts-ignore Object could be undefined
+                    return exception.values[0].stacktrace.frames;
+                }
+                catch (_oO) {
+                    return undefined;
+                }
+            }
+            else if (event.stacktrace) {
+                return event.stacktrace.frames;
+            }
+            return undefined;
+        };
+        /** JSDoc */
+        Dedupe.prototype._isSameStacktrace = function (currentEvent, previousEvent) {
+            var currentFrames = this._getFramesFromEvent(currentEvent);
+            var previousFrames = this._getFramesFromEvent(previousEvent);
+            // If neither event has a stacktrace, they are assumed to be the same
+            if (!currentFrames && !previousFrames) {
+                return true;
+            }
+            // If only one event has a stacktrace, but not the other one, they are not the same
+            if ((currentFrames && !previousFrames) || (!currentFrames && previousFrames)) {
+                return false;
+            }
+            currentFrames = currentFrames;
+            previousFrames = previousFrames;
+            // If number of frames differ, they are not the same
+            if (previousFrames.length !== currentFrames.length) {
+                return false;
+            }
+            // Otherwise, compare the two
+            for (var i = 0; i < previousFrames.length; i++) {
+                var frameA = previousFrames[i];
+                var frameB = currentFrames[i];
+                if (frameA.filename !== frameB.filename ||
+                    frameA.lineno !== frameB.lineno ||
+                    frameA.colno !== frameB.colno ||
+                    frameA.function !== frameB.function) {
+                    return false;
+                }
+            }
+            return true;
+        };
+        /** JSDoc */
+        Dedupe.prototype._getExceptionFromEvent = function (event) {
+            return event.exception && event.exception.values && event.exception.values[0];
+        };
+        /** JSDoc */
+        Dedupe.prototype._isSameExceptionEvent = function (currentEvent, previousEvent) {
+            var previousException = this._getExceptionFromEvent(previousEvent);
+            var currentException = this._getExceptionFromEvent(currentEvent);
+            if (!previousException || !currentException) {
+                return false;
+            }
+            if (previousException.type !== currentException.type || previousException.value !== currentException.value) {
+                return false;
+            }
+            if (!this._isSameFingerprint(currentEvent, previousEvent)) {
+                return false;
+            }
+            if (!this._isSameStacktrace(currentEvent, previousEvent)) {
+                return false;
+            }
+            return true;
+        };
+        /** JSDoc */
+        Dedupe.prototype._isSameFingerprint = function (currentEvent, previousEvent) {
+            var currentFingerprint = currentEvent.fingerprint;
+            var previousFingerprint = previousEvent.fingerprint;
+            // If neither event has a fingerprint, they are assumed to be the same
+            if (!currentFingerprint && !previousFingerprint) {
+                return true;
+            }
+            // If only one event has a fingerprint, but not the other one, they are not the same
+            if ((currentFingerprint && !previousFingerprint) || (!currentFingerprint && previousFingerprint)) {
+                return false;
+            }
+            currentFingerprint = currentFingerprint;
+            previousFingerprint = previousFingerprint;
+            // Otherwise, compare the two
+            try {
+                return !!(currentFingerprint.join('') === previousFingerprint.join(''));
+            }
+            catch (_oO) {
+                return false;
+            }
+        };
+        /**
+         * @inheritDoc
+         */
+        Dedupe.id = 'Dedupe';
+        return Dedupe;
+    }());
+
 
 
     var BrowserIntegrations = /*#__PURE__*/Object.freeze({
@@ -6343,7 +6543,8 @@ var Sentry = (function (exports) {
         TryCatch: TryCatch,
         Breadcrumbs: Breadcrumbs,
         LinkedErrors: LinkedErrors,
-        UserAgent: UserAgent
+        UserAgent: UserAgent,
+        Dedupe: Dedupe
     });
 
     /**
@@ -6421,6 +6622,7 @@ var Sentry = (function (exports) {
         new Breadcrumbs(),
         new GlobalHandlers(),
         new LinkedErrors(),
+        new Dedupe(),
         new UserAgent(),
     ];
     /**
@@ -6507,10 +6709,15 @@ var Sentry = (function (exports) {
      */
     function showReportDialog(options) {
         if (options === void 0) { options = {}; }
-        if (!options.eventId) {
-            options.eventId = getCurrentHub().lastEventId();
+        var hub = getCurrentHub();
+        var scope = hub.getScope();
+        if (scope) {
+            options.user = __assign(__assign({}, scope.getUser()), options.user);
         }
-        var client = getCurrentHub().getClient();
+        if (!options.eventId) {
+            options.eventId = hub.lastEventId();
+        }
+        var client = hub.getClient();
         if (client) {
             client.showReportDialog(options);
         }

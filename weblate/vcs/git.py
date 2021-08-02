@@ -35,6 +35,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy
 from git.config import GitConfigParser
 
+from weblate.utils.data import data_dir
 from weblate.utils.errors import report_error
 from weblate.utils.files import is_excluded, remove_tree
 from weblate.utils.render import render_template
@@ -86,8 +87,28 @@ class GitRepository(Repository):
 
         raise RepositoryException(0, "Failed to figure out remote branch")
 
-    def config_update(self, *updates):
-        filename = os.path.join(self.path, ".git", "config")
+    @staticmethod
+    def git_config_update(filename: str, *updates: Tuple[str, str, str]):
+        # First, open file read-only to check current settings
+        modify = False
+        with GitConfigParser(file_or_files=filename, read_only=True) as config:
+            for section, key, value in updates:
+                try:
+                    old = config.get(section, key)
+                    if value is None:
+                        modify = True
+                        break
+                    if old == value:
+                        continue
+                except (NoSectionError, NoOptionError):
+                    pass
+                if value is not None:
+                    modify = True
+                    break
+        if not modify:
+            return
+        # In case changes are needed, open it for writing as that creates a lock
+        # file
         with GitConfigParser(file_or_files=filename, read_only=False) as config:
             for section, key, value in updates:
                 try:
@@ -101,6 +122,10 @@ class GitRepository(Repository):
                     pass
                 if value is not None:
                     config.set_value(section, key, value)
+
+    def config_update(self, *updates: Tuple[str, str, str]):
+        filename = os.path.join(self.path, ".git", "config")
+        self.git_config_update(filename, *updates)
 
     def check_config(self):
         """Check VCS configuration."""
@@ -379,27 +404,28 @@ class GitRepository(Repository):
     def global_setup(cls):
         """Perform global settings."""
         merge_driver = cls.get_merge_driver("po")
+        updates = [
+            ("user", "email", settings.DEFAULT_COMMITER_EMAIL),
+            ("user", "name", settings.DEFAULT_COMMITER_NAME),
+        ]
         if merge_driver is not None:
-            cls._popen(
-                [
-                    "config",
-                    "--global",
-                    "merge.weblate-merge-gettext-po.name",
+            updates.append(
+                (
+                    'merge "weblate-merge-gettext-po"',
+                    "name",
                     "Weblate merge driver for Gettext PO files",
-                ]
+                )
             )
-            cls._popen(
-                [
-                    "config",
-                    "--global",
-                    "merge.weblate-merge-gettext-po.driver",
+            updates.append(
+                (
+                    'merge "weblate-merge-gettext-po"',
+                    "driver",
                     f"{merge_driver} %O %A %B",
-                ]
+                )
             )
-        cls._popen(
-            ["config", "--global", "user.email", settings.DEFAULT_COMMITER_EMAIL]
-        )
-        cls._popen(["config", "--global", "user.name", settings.DEFAULT_COMMITER_NAME])
+
+        filename = os.path.join(data_dir("home"), ".gitconfig")
+        cls.git_config_update(filename, *updates)
 
     def get_file(self, path, revision):
         """Return content of file at given revision."""
@@ -656,8 +682,16 @@ class GitMergeRequestBase(GitForcePushRepository):
         else:
             path = parsed.path
         parts = path.split(":")[-1].rstrip("/").split("/")
-        slug = parts[-1].replace(".git", "")
-        owner = "/".join(part for part in parts[:-1] if part)
+        slug_parts = [parts[-1].replace(".git", "")]
+        owner = ""
+        for part in parts[:-1]:
+            if not part:
+                continue
+            if not owner:
+                owner = part
+                continue
+            slug_parts.insert(-1, part)
+        slug = "/".join(slug_parts)
         return (
             self.API_TEMPLATE.format(
                 host=self.format_api_host(host),
