@@ -1531,6 +1531,7 @@ Parsers["icu-message-format"] = {
   },
   interpret,
   extract,
+  wrapText: true,
 };
 
 Parsers["icu-message-format+xml"] = {
@@ -1539,6 +1540,7 @@ Parsers["icu-message-format+xml"] = {
   },
   interpret,
   extract,
+  wrapText: true,
 };
 
 },{"format-message-interpret":2,"format-message-parse":4}]},{},[6]);

@@ -13,8 +13,17 @@
 <script defer data-cfasync="false" src="{% static 'editor/full.js' %}{{ cache_param }}"></script>
 {% endcompress %}
 {% if live_preview %}
+{% if live_preview_icu %}
 {% compress js %}
-<script defer data-cfasync="false" src="{% static 'vendor/icu-message-format.js' %}{{ cache_param }}"></script>
+<script defer data-cfasync="false" src="{% static 'vendor/lp-icu.js' %}{{ cache_param }}"></script>
+{% endcompress %}
+{% endif %}
+{% if live_preview_md %}
+{% compress js %}
+<script defer data-cfasync="false" src="{% static 'vendor/lp-markdown.js' %}{{ cache_param }}"></script>
+{% endcompress %}
+{% endif %}
+{% compress js %}
 <script defer data-cfasync="false" src="{% static 'editor/live_preview.js' %}{{ cache_param }}"></script>
 {% endcompress %}
 {% endif %}
@@ -400,7 +409,7 @@
             </h4>
         </div>
         <div class="panel-body">
-            <div class="wrap-text"></div>
+            <div id="lp_result"></div>
         </div>
         <div class="panel-footer">
           <div class="form-horizontal"></div>

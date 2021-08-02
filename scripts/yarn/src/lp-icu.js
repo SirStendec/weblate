@@ -106,6 +106,7 @@ Parsers["icu-message-format"] = {
   },
   interpret,
   extract,
+  wrapText: true,
 };
 
 Parsers["icu-message-format+xml"] = {
@@ -114,4 +115,5 @@ Parsers["icu-message-format+xml"] = {
   },
   interpret,
   extract,
+  wrapText: true,
 };

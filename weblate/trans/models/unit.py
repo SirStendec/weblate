@@ -1316,11 +1316,22 @@ class Unit(FastDeleteModelMixin, models.Model, LoggerMixin):
     def live_preview(self):
         """Returns the mode for Live Preview, or None if not supported."""
         flags = self.all_flags
+
+        if "lp-mode" in flags:
+            value = flags.get_value("lp-mode")
+            if not value or value.lower() in ("none", "off", "false"):
+                return None
+            return value
+
         if "icu-message-format" in flags:
             if "icu-flags" in flags:
                 if "xml" in flags.get_value("icu-flags"):
                     return "icu-message-format+xml"
             return "icu-message-format"
+
+        if "md-text" in flags:
+            return "markdown"
+
         return None
 
     @cached_property

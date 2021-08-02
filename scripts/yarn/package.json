@@ -4,9 +4,10 @@
   "main": "index.js",
   "license": "GPL-3.0+",
   "scripts": {
-    "build:icu-message-format": "browserify ./src/icu-message-format.js -o icu-message-format.js",
+    "build:lp-icu": "browserify ./src/lp-icu.js -o lp-icu.js",
+    "build:lp-markdown": "browserify ./src/lp-markdown.js -o lp-markdown.js",
     "build:modernizr": "modernizr -c ./modernizr-config.json -d modernizr.js",
-    "build": "npm run build:icu-message-format && npm run build:modernizr"
+    "build": "npm run build:lp-icu && npm run build:lp-markdown && npm run build:modernizr"
   },
   "dependencies": {
     "@sentry/browser": "6.10.0",
@@ -20,6 +21,7 @@
     "format-message-parse": "^6.2.3",
     "jquery": "^3.6.0",
     "js-cookie": "^3.0.0",
+    "markdown-it": "^12.2.0",
     "modernizr": "^3.11.7",
     "mousetrap": "^1.6.5",
     "mousetrap-global-bind": "^1.1.0",

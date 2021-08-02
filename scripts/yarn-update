@@ -47,8 +47,9 @@ cp node_modules/multi.js/src/multi.css ../../weblate/static/vendor/
 # Modernizr
 mv modernizr.js ../../weblate/static/vendor/
 
-# ICU MessageFormat
-mv icu-message-format.js ../../weblate/static/vendor/
+# LivePreview
+mv lp-icu.js ../../weblate/static/vendor/
+mv lp-markdown.js ../../weblate/static/vendor/
 
 # Slugify
 cp node_modules/slugify/slugify.js ../../weblate/static/vendor/slugify.js

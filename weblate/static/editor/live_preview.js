@@ -107,6 +107,7 @@ function initLivePreview(root, attempt = 0) {
 
   const updateTranslation = () => {
     body.innerHTML = "";
+    body.classList.toggle("wrap-text", parser.wrapText);
 
     if (error) {
       body.textContent = error;

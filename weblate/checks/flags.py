@@ -75,6 +75,8 @@ TYPED_FLAGS["variant"] = gettext_lazy("String variant")
 TYPED_FLAGS_ARGS["variant"] = single_value_flag(str)
 TYPED_FLAGS["icu-flags"] = gettext_lazy("ICU MessageFormat Flags")
 TYPED_FLAGS_ARGS["icu-flags"] = multi_value_flag(str)
+TYPED_FLAGS["lp-mode"] = gettext_lazy("LivePreview Mode")
+TYPED_FLAGS_ARGS["lp-mode"] = single_value_flag(str)
 TYPED_FLAGS["lp-defaults"] = gettext_lazy("LivePreview Defaults")
 TYPED_FLAGS_ARGS["lp-defaults"] = single_value_flag(str)
 

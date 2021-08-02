@@ -602,6 +602,8 @@ def translate(request, project, component, lang):  # noqa: C901
             unit.translation.component, initial={"translation": unit.translation}
         )
 
+    live_preview = unit.live_preview
+
     return render(
         request,
         "translate.html",
@@ -616,7 +618,9 @@ def translate(request, project, component, lang):  # noqa: C901
             "unit": unit,
             "nearby": unit.nearby(request.user.profile.nearby_strings),
             "nearby_keys": unit.nearby_keys(request.user.profile.nearby_strings),
-            "live_preview": unit.live_preview,
+            "live_preview": live_preview,
+            "live_preview_md": live_preview and "markdown" in live_preview,
+            "live_preview_icu": live_preview and "icu-message-format" in live_preview,
             "live_preview_defaults": unit.live_preview_defaults,
             "others": get_other_units(unit),
             "search_url": search_result["url"],
