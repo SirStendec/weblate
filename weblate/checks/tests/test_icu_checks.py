@@ -355,6 +355,5 @@ class ICUXMLFormatCheckTest(ICUMessageFormatCheckTest):
             highlights,
             [
                 (14, 22, "{na<>me}"),
-                # (41, 92, "{count, plural, one {# message} other {# messages}}"),
             ],
         )
